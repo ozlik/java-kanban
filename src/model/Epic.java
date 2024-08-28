@@ -4,21 +4,25 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
-    public ArrayList<SubTask> epicSubTask = new ArrayList<>();
+    public ArrayList<Integer> epicSubtasksId = new ArrayList<>();
 
-    public Epic(String title, String description, TaskStatus status, TaskType type) {
-        super(title, description, status, type);
+    public Epic(String title, String description) {
+        super(title, description);
     }
 
-    public Epic() {
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
-    public void addSubTask(SubTask subtask) {
-        this.epicSubTask.add(subtask);
+     public void addSubTask(Integer id) { //обновление статуса вынесено в обновление подзадачи,
+        //все эпики задачи и подзадачи при создании имеют статус нью, для подзадач и задач можем заменить при обновлении
+//для эпика меняем при обновлении подзадачи, в методе менеджера происходит поправка на статус
+        this.epicSubtasksId.add(id);
     }
 
-    public ArrayList<SubTask> getSubTasks() {
-        return epicSubTask;
+    public ArrayList<Integer> getSubTasks() {
+        return epicSubtasksId;
     }
 
     @Override
@@ -27,12 +31,19 @@ public class Epic extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return Objects.equals(epicSubTask, epic.epicSubTask);
+        return Objects.equals(epicSubtasksId, epic.epicSubtasksId);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(epicSubTask);
+    public String toString() {
+        return "Epic{" +
+                "id=" + getId() +
+                ", title='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getStatus() +
+                ", type=" + getType() +
+                ", epicSubtasksId=" + epicSubtasksId +
+                '}';
     }
 }
 

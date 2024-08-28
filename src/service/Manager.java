@@ -1,150 +1,224 @@
 package service;
 
-import model.Epic;
-import model.Task;
-import model.SubTask;
-import model.TaskStatus;
+import model.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 public class Manager {
 
     protected HashMap<Integer, Task> tasks = new HashMap<>();
     protected HashMap<Integer, Epic> epics = new HashMap<>();
     protected HashMap<Integer, SubTask> subtasks = new HashMap<>();
+    private static int idCounter = 0;
 
-    Epic epic = new Epic();
-    SubTask subtask = new SubTask();
-
-    private static class IdGenerator {
-        private static int nextId = 0;
-
-        public static int getNextId() {
-            return nextId++;
-        }
+    private static int getIdCounter() {
+        return idCounter++;
     }
+
     //методы для Task
+    public HashMap<Integer, Task> getTasks() {
+        if (!tasks.isEmpty()) {
+            return tasks;
+        }
+        return null;
+    }
+
+    public Task getTaskByID(Integer id) {
+        if (!tasks.isEmpty()) {
+            return tasks.get(id);
+        }
+        return null;
+    }
 
     //создаём новую задачу
     public void createTask(Task task) {
-        Integer id = IdGenerator.getNextId();
-        task.setId(id);
-        tasks.put(id, task);
+        if (!task.equals(null)) { //добавила проверку на ноль, так верно будет её задать?
+            Integer id = getIdCounter();
+            task.setId(id);
+            task.setStatus(TaskStatus.NEW);
+            tasks.put(id, task);
+        }
     }
 
     public void updateTask(Integer id, Task task) {
-        if (tasks.containsKey(id)) {
-            tasks.put(id, task);
-        } else {
-            System.out.println("Задача не найдена.");
+        if (!tasks.isEmpty() && tasks.containsKey(id)) {
+            task.setId(id);
+            tasks.put(id, task); //столкнулась с проблемой, что если не задавать статус при обновлении, он становится нулевым,
+            // что делать? Т_Т
         }
     }
 
     public void clearTaskByID(Integer id) {
-        if (tasks.containsKey(id)) {
+        if (!tasks.isEmpty() && tasks.containsKey(id)) {
             tasks.remove(id);
-        } else {
-            System.out.println("Задача не найдена.");
         }
     }
 
-    public void clearManager() {
-        tasks.clear();
-        subtasks.clear();
-        epics.clear();
+    public void clearTaskManager() {
+        if (!tasks.isEmpty()) {
+            tasks.clear();
+        }
     }
 
     //методы для Epic
-    public void createEpic(Epic epic) {
-        Integer id = IdGenerator.getNextId();
-        epic.setId(id);
-        epics.put(id, epic);
+    public HashMap<Integer, Epic> getEpics() {
+        if (!epics.isEmpty()) {
+            return epics;
+        }
+        return null;
     }
 
     public ArrayList<SubTask> getSubTaskByEpic(Integer id) {
-        Epic epic = epics.get(id);
-        return epic.getSubTasks();
+        if (epics.containsKey(id)) {
+            Epic epic = epics.get(id);
+            ArrayList<SubTask> epicSubtask = new ArrayList<>();
+            for (Integer i : epic.getSubTasks()) {
+                epicSubtask.add(subtasks.get(i));
+            }
+            return epicSubtask;
+        }
+        return null;
+    }
+
+    public Epic getEpicByID(Integer id) {
+        if (!epics.isEmpty()) {
+            return epics.get(id);
+        }
+        return null;
+    }
+
+    public void createEpic(Epic epic) {
+        Integer id = getIdCounter();
+        epic.setId(id);
+        epic.setStatus(TaskStatus.NEW);
+        epic.setType(epic.getType());
+        epics.put(id, epic);
+    }
+
+    public void updateEpic(Integer id, Epic epic) {
+        if (epics.containsKey(id)) {
+            epic.setId(id);
+            Epic oldEpic = epics.get(id);
+            ArrayList<Integer> epicSubtasks = oldEpic.getSubTasks();
+            for (Integer i : epicSubtasks) {
+                epic.addSubTask(i);
+            }
+            epics.put(id, epic);
+            updateEpicStatus(id);
+        }
     }
 
     public void deleteEpicByID(Integer epicId) {
         if (epics.get(epicId) != null) {
             Epic epic = epics.get(epicId);
-            ArrayList<SubTask> subtasksToRemove = epic.getSubTasks();
+            ArrayList<Integer> subtasksToRemove = epic.getSubTasks();
             epics.remove(epicId);
-            for (SubTask sb : subtasksToRemove) {
-                subtasks.remove(sb.getId());
+            for (Integer id : subtasksToRemove) {
+                subtasks.remove(id);
             }
         }
     }
 
+    public void clearEpicManager() {
+        if (!epics.isEmpty()) {
+            for (Epic epic : epics.values()) {
+                ArrayList<Integer> subtasksToRemove = epic.getSubTasks();
+                for (Integer id : subtasksToRemove) {
+                    subtasks.remove(id);
+                }
+            }
+            epics.clear();
+        }
+    }
 
     //методы для Subtask
+
+    public HashMap<Integer, SubTask> getSubtasks() {
+        if (!subtasks.isEmpty()) {
+            return subtasks;
+        }
+        return null;
+    }
+
+    public SubTask getSubtaskById(Integer id) {
+        if (!subtasks.isEmpty()) {
+            return subtasks.get(id);
+        }
+        return null;
+    }
+
     public void createSubtask(SubTask subtask) {
-        Integer id = IdGenerator.getNextId();
-        subtask.setId(id);
-        Epic epic = epics.get(subtask.getEpicId());
-        epic.addSubTask(subtask);
-        subtasks.put(id, subtask);
-    }
-
-    public void updateSubTask(Integer id, SubTask subtask) { //статус эпика меняется при смене статуса подзадач во время обновления поздадачи
-        if (subtasks.containsKey(id)) {
-            SubTask subtaskToRemove = subtasks.get(id);
+        if (!epics.isEmpty() && epics.containsKey(subtask.getEpicId())) {
+            Integer id = getIdCounter();
             subtask.setId(id);
-            subtasks.put(id, subtask);
+            subtask.setStatus(TaskStatus.NEW);
+            subtask.setType(subtask.getType());
             Epic epic = epics.get(subtask.getEpicId());
-            epic.getSubTasks().remove(subtaskToRemove);
-            epic.addSubTask(subtask);
-            ArrayList<SubTask> subtasksToCheck = epic.getSubTasks();
-            updateEpicStatus(subtasksToCheck);
-        } else {
-            System.out.println("Такой подзадачи нет");
+            epic.addSubTask(id);
+            subtasks.put(id, subtask);
+
         }
     }
 
-    private void updateEpicStatus(ArrayList<SubTask> subtaskToCheck) {
-        boolean allDone = true;
-        for (SubTask subtask : subtaskToCheck) {
-            if (subtask.getStatus() != TaskStatus.DONE) {
-                allDone = false;
-                break;
-            }
+    //не стала убирать возможность написать id эпика, чтобы подзадачу можно было перезакрепить к другому эпику, но можно и убрать
+    public void updateSubTask(Integer id, SubTask subtask) { //статус эпика меняется при смене статуса подзадач во время обновления поздадачи
+        if (!subtasks.isEmpty() && !epics.isEmpty() && subtasks.containsKey(id)) {
+            subtask.setId(id);
+            SubTask oldSubtask = subtasks.get(id);
+            subtask.setEpicId(oldSubtask.getEpicId());
+            subtasks.put(id, subtask);
+            updateEpicStatus(subtask.getEpicId());
+
         }
-        for (SubTask subtask : subtaskToCheck) {
-            if (subtask.getStatus().equals(TaskStatus.IN_PROGRESS)) {
-                Epic epic = epics.get(subtask.getEpicId());
+    }
+
+//    на статус ин прогресс, так если хотя бы один раз он есть, значит уже ставим только этот статус
+//    не проверяла на статус нью изначально, так как у нас при создании задач этот статус стоит по умолчанию и только если
+//    подзадачу сначала апдтейтили в статус ин прогресс и потом снова обновили, но уже в статус нью, тогда да, нужна проверка на нью
+//    плюс проверка полезна при обновлении эпика, когда все его задачи в статусе нью, иначе статус заполняется нулем.
+
+    private void updateEpicStatus(Integer id) {
+        Epic epic = epics.get(id);
+        Integer doneCount = 0;
+        Integer newCount = 0;
+        ArrayList<Integer> subtaskToCheck = epic.getSubTasks();
+        for (Integer i : subtaskToCheck) {
+            SubTask subtask = subtasks.get(i);
+            if (subtask.getStatus().equals(TaskStatus.DONE)) {
+                doneCount++;
+                if (doneCount.equals(subtaskToCheck.size())) {
+                    epic.setStatus(TaskStatus.DONE);
+                    break;
+                }
+            } else if (subtask.getStatus().equals(TaskStatus.NEW)) {
+                newCount++;
+                if (newCount.equals(subtaskToCheck.size())) {
+                    epic.setStatus(TaskStatus.NEW);
+                    break;
+                }
+            } else if (subtask.getStatus().equals(TaskStatus.IN_PROGRESS)) {
                 epic.setStatus(TaskStatus.IN_PROGRESS);
                 break;
             }
         }
-        if (allDone) {
-            Epic epic = epics.get(subtask.getEpicId());
-            epic.setStatus(TaskStatus.DONE);
+    }
+
+
+    public void clearSubaskManager() { //я не стала добавлять логику если это последняя задача эпика, так как в эпик
+        //  должна остаться возможность добавить еще подзадач
+        if (!subtasks.isEmpty()) {
+            subtasks.clear();
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Manager manager = (Manager) o;
-        return Objects.equals(tasks, manager.tasks) && Objects.equals(epics, manager.epics) && Objects.equals(subtasks, manager.subtasks) && Objects.equals(epic, manager.epic) && Objects.equals(subtask, manager.subtask);
-    }
-
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tasks, epics, subtasks, epic, subtask);
-    }
-
-    @Override
-    public String toString() {
-        return "Manager{" +
-                "tasks=" + tasks +
-                ", epics=" + epics +
-                ", subtasks=" + subtasks +
-                '}';
+    public void clearSubTaskByID(Integer id) {
+        if (subtasks.containsKey(id)) {
+            SubTask subtask = subtasks.get(id);
+            Epic epic = epics.get(subtask.getEpicId());
+            ArrayList<Integer> epicSubtasks = epic.getSubTasks();
+            epicSubtasks.remove(id);
+            subtasks.remove(id);
+        }
     }
 }

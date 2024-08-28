@@ -8,45 +8,20 @@ public class Task {
     private String title;
     private String description;
     private TaskStatus status;
-    private TaskType type;
-
-    public Task(String title, String description) {
-
-        this.title = title;
-        this.description = description;
-    }
-
-    public Task(String title, String description, TaskStatus status, TaskType type) {
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.type = type;
-    }
+    private TaskType type = TaskType.TASK; //откорректировала, так действительно лучше
 
     public Task(String title, String description, TaskStatus status) {
 
         this.title = title;
         this.description = description;
-        this.status = status;
+        this.status=status;
+        //здесь проставила статус при создании задачи, как лучше сделать? на уровне конструктора или в методе?
     }
 
-    public Task() {
-    }
-
-    public Task(Integer id, String title, String description) {
-        this.id = id;
+    public Task(String title, String description) {
         this.title = title;
         this.description = description;
     }
-
-    public Task(Integer id, TaskType type, TaskStatus status, String title, String description) {
-        this.id = id;
-        this.type = type;
-        this.status = status;
-        this.title = title;
-        this.description = description;
-    }
-
 
     public void setId(Integer id) {
         this.id = id;
@@ -77,12 +52,8 @@ public class Task {
         return TaskType.TASK;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setType(TaskType type) {
+        this.type = type;
     }
 
     @Override
@@ -93,7 +64,6 @@ public class Task {
         return Objects.equals(title, task.title) && Objects.equals(description, task.description) &&
                 status == task.status;
     }
-
 
     @Override
     public String toString() {
