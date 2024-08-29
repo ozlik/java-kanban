@@ -4,7 +4,16 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
+
     public ArrayList<Integer> epicSubtasksId = new ArrayList<>();
+
+    public Epic(Integer id, String title, String description, TaskStatus status, TaskType type) {
+        super(id, title, description, status, type);
+    }
+
+    public Epic(Integer id, String title, String description) {
+        super(id, title, description);
+    }
 
     public Epic(String title, String description) {
         super(title, description);
@@ -15,14 +24,20 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
-     public void addSubTask(Integer id) { //обновление статуса вынесено в обновление подзадачи,
-        //все эпики задачи и подзадачи при создании имеют статус нью, для подзадач и задач можем заменить при обновлении
-//для эпика меняем при обновлении подзадачи, в методе менеджера происходит поправка на статус
+    public void addSubTask(Integer id) {
         this.epicSubtasksId.add(id);
+    }
+
+    public void deleteSubTask(Integer id) {
+        this.epicSubtasksId.remove(id);
     }
 
     public ArrayList<Integer> getSubTasks() {
         return epicSubtasksId;
+    }
+
+    public void setSubTasks(ArrayList<Integer> epicSubtasksId) {
+        this.epicSubtasksId = epicSubtasksId;
     }
 
     @Override

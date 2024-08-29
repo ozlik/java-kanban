@@ -8,14 +8,36 @@ public class Task {
     private String title;
     private String description;
     private TaskStatus status;
-    private TaskType type = TaskType.TASK; //откорректировала, так действительно лучше
+    protected TaskType type = TaskType.TASK; //откорректировала, так действительно лучше
+
+    public Task(Integer id, String title, String description, TaskStatus status, TaskType type) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.type = type;
+
+    }
+
+    public Task(Integer id, String title, String description, TaskStatus status) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
 
     public Task(String title, String description, TaskStatus status) {
 
         this.title = title;
         this.description = description;
-        this.status=status;
+        this.status = status;
         //здесь проставила статус при создании задачи, как лучше сделать? на уровне конструктора или в методе?
+    }
+
+    public Task(Integer id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
     }
 
     public Task(String title, String description) {
