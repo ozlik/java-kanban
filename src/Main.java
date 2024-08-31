@@ -32,7 +32,7 @@ public class Main {
         System.out.println(manager.getSubTaskByEpic(2));
 
         SubTask subtask3UpDate = new SubTask(6, "2 второго эпика", "Описание 2 подзадачи второго эпика",
-                TaskStatus.IN_PROGRESS);
+                TaskStatus.DONE);
         Task task1UpDate = new Task(1, "Первая обновлённая задача", "Описание первой задачи",
                 TaskStatus.IN_PROGRESS);
         Epic epic1UpDate = new Epic(2, "Первый обновлённый эпик", "Описание первого эпика");

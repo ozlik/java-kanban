@@ -30,17 +30,14 @@ public class Manager {
         if (task != null) {
             Integer id = getIdCounter();
             task.setId(id);
-            Task newTask = new Task(task.getId(), task.getTitle(), task.getDescription(),
-                    task.getStatus(), task.getType());
-            tasks.put(id, newTask);
-            return newTask;
+            tasks.put(id, task);
+            return task;
         }
         return null;
     }
 
     public Task updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
-            task.setId(task.getId());
             tasks.put(task.getId(), task);
             return task;
         }
@@ -76,27 +73,23 @@ public class Manager {
         return epics.get(id);
     }
 
-    public Epic createEpic(Epic epic) {
+    public Epic createEpic(Epic epic) { //а здесь получается за счет сетеров автоматом добавляется и статус и тип?
+//        и их можно не прописывать дополнительно нигде?
         if (epic != null) {
             Integer id = getIdCounter();
             epic.setId(id);
-            epic.setStatus(TaskStatus.NEW);
-            Epic newEpic = new Epic(epic.getId(), epic.getTitle(), epic.getDescription(),
-                    epic.getStatus(), epic.getType());
-            epics.put(id, newEpic);
-            return newEpic;
+            epics.put(id, epic);
+            return epic;
         }
         return null;
     }
 
     public Epic updateEpic(Epic epic) {
         if (epics.containsKey(epic.getId())) {
-            epic.setId(epic.getId());
             Epic oldEpic = epics.get(epic.getId());
-            epic.setStatus(oldEpic.getStatus());
-            epic.setSubTasks(oldEpic.getSubTasks());
-            epics.put(epic.getId(), epic);
-            return epic;
+            oldEpic.setTitle(epic.getTitle());
+            oldEpic.setDescription(epic.getDescription());
+            return oldEpic;
         }
         return null;
     }
@@ -129,26 +122,20 @@ public class Manager {
         if (subtask != null && epics.containsKey(subtask.getEpicId())) {
             Integer id = getIdCounter();
             subtask.setId(id);
-            SubTask newSubtask = new SubTask(subtask.getId(), subtask.getTitle(), subtask.getDescription(),
-                    subtask.getStatus(), subtask.getType(), subtask.getEpicId());
             Epic epic = epics.get(subtask.getEpicId());
             epic.addSubTask(id);
-            subtasks.put(id, newSubtask);
+            subtasks.put(id, subtask);
             updateEpicStatus(epic.getId());
-            return newSubtask;
+            return subtask;
         }
         return null;
     }
 
     public SubTask updateSubTask(SubTask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
-            subtask.setId(subtask.getId());
             SubTask oldSubtask = subtasks.get(subtask.getId());
             subtask.setEpicId(oldSubtask.getEpicId());
             subtasks.put(subtask.getId(), subtask);
-            Epic epic = epics.get(subtask.getEpicId());
-            epic.deleteSubTask(subtask.getId());
-            epic.addSubTask(subtask.getId());
             updateEpicStatus(subtask.getEpicId());
             return subtask;
         }
@@ -160,11 +147,10 @@ public class Manager {
         Integer doneCount = 0;
         Integer newCount = 0;
         ArrayList<Integer> subtaskToCheck = epic.getSubTasks();
-        if (subtaskToCheck != null) {
+        if (!subtaskToCheck.isEmpty()) {
             for (Integer i : subtaskToCheck) {
                 SubTask subtask = subtasks.get(i);
-                if (subtask.getStatus().equals(TaskStatus.IN_PROGRESS)) { //я добавила проверку на прогресс вначале,
-                    // чтобы не приходилось проверять весь список задач
+                if (subtask.getStatus().equals(TaskStatus.IN_PROGRESS)) {
                     break;
                 } else if (subtask.getStatus().equals(TaskStatus.DONE)) {
                     doneCount++;

@@ -7,23 +7,15 @@ public class Task {
     private Integer id;
     private String title;
     private String description;
-    private TaskStatus status;
-    protected TaskType type = TaskType.TASK; //откорректировала, так действительно лучше
+    private TaskStatus status = TaskStatus.NEW; //здесь тоже добавила, чтобы если задачу создают без статуса, он проставлялся
+    protected TaskType type=TaskType.TASK;
 
-    public Task(Integer id, String title, String description, TaskStatus status, TaskType type) {
+     public Task(Integer id, String title, String description, TaskStatus status) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
-        this.type = type;
 
-    }
-
-    public Task(Integer id, String title, String description, TaskStatus status) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.status = status;
     }
 
     public Task(String title, String description, TaskStatus status) {
@@ -31,7 +23,7 @@ public class Task {
         this.title = title;
         this.description = description;
         this.status = status;
-        //здесь проставила статус при создании задачи, как лучше сделать? на уровне конструктора или в методе?
+
     }
 
     public Task(Integer id, String title, String description) {
@@ -75,7 +67,15 @@ public class Task {
     }
 
     public void setType(TaskType type) {
-        this.type = type;
+        this.type = TaskType.TASK;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
