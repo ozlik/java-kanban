@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Objects;
-
 public class Task {
 
     private Integer id;
@@ -66,7 +64,7 @@ public class Task {
         return TaskType.TASK;
     }
 
-    public void setType(TaskType type) {
+    protected void setType(TaskType type) {
         this.type = TaskType.TASK;
     }
 
@@ -83,8 +81,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(title, task.title) && Objects.equals(description, task.description) &&
-                status == task.status;
+        return id == task.id;
     }
 
     @Override

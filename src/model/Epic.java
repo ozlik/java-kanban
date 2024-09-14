@@ -21,7 +21,7 @@ public class Epic extends Task {
     }
 
     @Override
-    public void setType(TaskType type) {
+   protected void setType(TaskType type) {
         this.type = TaskType.EPIC;
     }
 
