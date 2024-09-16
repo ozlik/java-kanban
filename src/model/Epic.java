@@ -7,12 +7,8 @@ public class Epic extends Task {
 
     private ArrayList<Integer> epicSubtasksId = new ArrayList<>();
 
-    public Epic(Integer id, String title, String description) {
-        super(id, title, description);
-    }
-
     public Epic(String title, String description) {
-        super(title, description);
+        super(title, description, TaskStatus.NEW);
     }
 
     @Override
@@ -20,11 +16,9 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
-    @Override
-   protected void setType(TaskType type) {
+    protected void setType(TaskType type) {
         this.type = TaskType.EPIC;
     }
-
 
     public void addSubTask(Integer id) {
         this.epicSubtasksId.add(id);
@@ -34,12 +28,12 @@ public class Epic extends Task {
         this.epicSubtasksId.remove(id);
     }
 
-    public ArrayList<Integer> getSubTasks() {
-        return epicSubtasksId;
+    public void deleteSubtasks() {
+        this.epicSubtasksId.clear();
     }
 
-    public void setSubTasks(ArrayList<Integer> epicSubtasksId) {
-        this.epicSubtasksId = epicSubtasksId;
+    public ArrayList<Integer> getSubTasks() {
+        return epicSubtasksId;
     }
 
     @Override

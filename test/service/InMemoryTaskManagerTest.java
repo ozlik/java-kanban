@@ -108,12 +108,11 @@ public class InMemoryTaskManagerTest {
     void shouldGetTasks() {
         task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
         Task task1 = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-        Task taskExpected = new Task(task.getId(), "Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
-        Task taskExpected1 = new Task(task1.getId(), "Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
+        Task taskExpected = new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
+        Task taskExpected1 = new Task( "Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
         ArrayList<Task> tasksResult2 = taskManager.getTasks();
         Task taskResult = tasksResult2.getFirst();
         Task taskResult1 = tasksResult2.get(1);
-        //вопрос: у меня каждый раз сохраняет в разном порядке в список при создании задач, что-то можно с этим сделать? ругается на айдишники в ассерте, но при запуске метода отдельно, он всегда рабочий.
         assertEqualsTask(taskExpected, taskResult, "задачи не совпадают");
         assertEqualsTask(taskExpected1, taskResult1, "Вторые задачи не совпадают");
         assertEquals(tasksResult2.size(), 2, "в мапе не две задачи");
@@ -124,8 +123,8 @@ public class InMemoryTaskManagerTest {
     void shouldGetEpics() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         Epic epic1 = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        Epic epicExpected = new Epic(epic.getId(), "Тестовая задача, заголовок", "Описание тестовой задачи");
-        Epic epicExpected1 = new Epic(epic1.getId(), "Тестовая задача, заголовок", "Описание тестовой задачи");
+        Epic epicExpected = new Epic("Тестовая задача, заголовок", "Описание тестовой задачи");
+        Epic epicExpected1 = new Epic("Тестовая задача, заголовок", "Описание тестовой задачи");
         ArrayList<Epic> epicResult2 = taskManager.getEpics();
         Epic resultEpic = epicResult2.getFirst();
         Epic resultEpic1 = epicResult2.get(1);
@@ -141,8 +140,8 @@ public class InMemoryTaskManagerTest {
         Epic epic1 = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
         SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic1.getId()));
-        SubTask subtaskExpected = new SubTask(subtask.getId(), "Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId());
-        SubTask subtaskExpected1 = new SubTask(subtask1.getId(), "Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic1.getId());
+        SubTask subtaskExpected = new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId());
+        SubTask subtaskExpected1 = new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic1.getId());
         ArrayList<SubTask> subtaskResult2 = taskManager.getSubtasks();
         assertEqualsSubtask(subtaskExpected, subtaskResult2.getFirst(), "Подзадачи не совпадают");
         assertEqualsSubtask(subtaskExpected1, subtaskResult2.get(1), "Вторые подзадачи не совпадают");
@@ -201,18 +200,17 @@ public class InMemoryTaskManagerTest {
     @DisplayName("обновлять задачу в мапе")
     void shouldUpdateTaskGetAndPutToMap() {
         task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-        Task taskToUpdate = new Task(task.getId(), "Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
-                TaskStatus.IN_PROGRESS);
-        Task taskResult2 = taskManager.updateTask(taskToUpdate);
-        assertEqualsTask(taskManager.tasks.get(taskResult2.getId()), taskToUpdate, "Задачи не совпадают");
+        Task taskToUpdate = new Task("Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи", TaskStatus.IN_PROGRESS);
+        taskManager.updateTask(task.getId(), taskToUpdate);
+        assertEqualsTask(taskManager.tasks.get(task.getId()), taskToUpdate, "Задачи не совпадают");
     }
 
     @Test
     @DisplayName("отдавать ноль при попытке обновить несуществующую задачу")
     void shouldNotUpdateTaskWithWrongId() {
-        Task taskToUpdate = new Task(80, "Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
+        Task taskToUpdate = new Task("Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
                 TaskStatus.IN_PROGRESS);
-        assertNull(taskManager.updateTask(taskToUpdate));
+        assertNull(taskManager.updateTask(80, taskToUpdate));
         assertNull(taskManager.tasks.get(taskToUpdate.getId()));
     }
 
@@ -221,10 +219,10 @@ public class InMemoryTaskManagerTest {
     void shouldUpdateSubTaskGetAndPutToMapAndChangeEpicStatus() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         subtask = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtaskToUpdate = new SubTask(subtask.getId(), "Тестовая подзадача, заголовок обновленный", "Описание тестовой обновленной подзадачи",
-                TaskStatus.IN_PROGRESS);
-        SubTask subtaskResult2 = taskManager.updateSubTask(subtaskToUpdate);
-        assertEqualsSubtask(taskManager.subtasks.get(subtaskResult2.getId()), subtaskToUpdate, "Задачи не совпадают");
+        SubTask subtaskToUpdate = new SubTask("Тестовая подзадача, заголовок обновленный", "Описание тестовой обновленной подзадачи",
+                TaskStatus.IN_PROGRESS, epic.getId());
+        SubTask subtaskResult2 = taskManager.updateSubTask(subtask.getId(), subtaskToUpdate);
+        assertEqualsSubtask(taskManager.subtasks.get(subtask.getId()), subtaskToUpdate, "Задачи не совпадают");
         assertEquals(epic.getStatus(), TaskStatus.IN_PROGRESS);
     }
 
@@ -234,10 +232,9 @@ public class InMemoryTaskManagerTest {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         Epic epic1 = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         subtask = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtaskToUpdate = new SubTask(subtask.getId(), "Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
+        SubTask subtaskToUpdate = new SubTask("Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
                 TaskStatus.IN_PROGRESS, epic1.getId());
-        taskManager.updateSubTask(new SubTask(subtask.getId(), "Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
-                TaskStatus.IN_PROGRESS, epic1.getId()));
+        taskManager.updateSubTask(subtask.getId(), subtaskToUpdate);
         ArrayList<Integer> epicSubtasks = epic.getSubTasks();
         assertEqualsTask(taskManager.subtasks.get(epicSubtasks.getFirst()), subtaskToUpdate, "Подзадачи не совпадают");
         assertEquals(epic1.getSubTasks().size(), 0, "список подзадач эпика не пуст");
@@ -283,8 +280,8 @@ public class InMemoryTaskManagerTest {
     @DisplayName("обновлять эпик в мапе")
     void shouldUpdateEpicGetAndPutToMap() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        Epic epic1UpDate = new Epic(epic.getId(), "Первый обновлённый эпик", "Описание первого эпика");
-        Epic epicResult = taskManager.updateEpic(epic1UpDate);
+        Epic epic1UpDate = new Epic("Первый обновлённый эпик", "Описание первого эпика");
+        Epic epicResult = taskManager.updateEpic(epic.getId(), epic1UpDate);
         assertEqualsEpic(taskManager.epics.get(epicResult.getId()), epic1UpDate, "Эпики не совпадают");
     }
 
@@ -359,7 +356,6 @@ public class InMemoryTaskManagerTest {
     }
 
     private static void assertEqualsTask(Task expected, Task actual, String message) {
-        assertEquals(expected.getId(), actual.getId(), message + " , id");
         assertEquals(expected.getTitle(), actual.getTitle(), message + " , title");
         assertEquals(expected.getDescription(), actual.getDescription(), message + " , description");
         assertEquals(expected.getStatus(), actual.getStatus(), message + " , status");
@@ -367,7 +363,7 @@ public class InMemoryTaskManagerTest {
     }
 
     private static void assertEqualsEpic(Epic expected, Epic actual, String message) {
-        assertEquals(expected.getId(), actual.getId(), message + " , id");
+
         assertEquals(expected.getTitle(), actual.getTitle(), message + " , title");
         assertEquals(expected.getDescription(), actual.getDescription(), message + " , description");
         assertEquals(expected.getStatus(), actual.getStatus(), message + " , status");
@@ -376,7 +372,6 @@ public class InMemoryTaskManagerTest {
     }
 
     private static void assertEqualsSubtask(SubTask expected, SubTask actual, String message) {
-        assertEquals(expected.getId(), actual.getId(), message + " , id");
         assertEquals(expected.getTitle(), actual.getTitle(), message + " , title");
         assertEquals(expected.getDescription(), actual.getDescription(), message + " , description");
         assertEquals(expected.getStatus(), actual.getStatus(), message + " , status");

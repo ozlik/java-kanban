@@ -32,17 +32,17 @@ public class Main {
         System.out.println(taskManager.getSubtaskById(5));
         System.out.println(taskManager.getSubTaskByEpic(2));
 
-        SubTask subtask3UpDate = new SubTask(6, "2 второго эпика", "Описание 2 подзадачи второго эпика",
-                TaskStatus.DONE);
-        Task task1UpDate = new Task(1, "Первая обновлённая задача", "Описание первой задачи",
+        SubTask subtask3UpDate = new SubTask("2 второго эпика", "Описание 2 подзадачи обновленной второго эпика",
+                TaskStatus.DONE, 3);
+        Task task1UpDate = new Task("Первая обновлённая задача", "Описание первой задачи",
                 TaskStatus.IN_PROGRESS);
-        Epic epic1UpDate = new Epic(2, "Первый обновлённый эпик", "Описание первого эпика");
-        taskManager.updateSubTask(subtask3UpDate);
+        Epic epic1UpDate = new Epic( "Первый обновлённый эпик", "Описание первого эпика");
+        taskManager.updateSubTask(6, subtask3UpDate);
         System.out.println("Обновили подзадачу" + taskManager.getSubtaskById(6));
         System.out.println("Эпик подзадачи" + taskManager.getEpicByID(3));
-        taskManager.updateTask(task1UpDate);
+        taskManager.updateTask(1, task1UpDate);
         System.out.println(taskManager.getTaskByID(1));
-        taskManager.updateEpic(epic1UpDate);
+        taskManager.updateEpic(2, epic1UpDate);
         System.out.println(taskManager.getEpicByID(2));
                 System.out.println();
 
@@ -60,16 +60,16 @@ public class Main {
         taskManager.deleteTaskByID(0);
         System.out.println("Удалили задачу по айди " + taskManager.getTasks());
         taskManager.deleteEpicByID(3);
-        System.out.println("Удалили эпик и его подзадачи " + taskManager.getEpics());
+        System.out.println("Удалили эпик и его подзадачи " + taskManager.getEpics() + taskManager.getSubtasks());
         taskManager.deleteSubtaskByID(5);
-        System.out.println("Удалили задачу по айди " + taskManager.getSubtasks());
+        System.out.println("Удалили подзадачу по айди " + taskManager.getSubtasks() + epic1.getSubTasks());
 
 
 
         taskManager.deleteTasks();
         System.out.println("Удалили задачи " + taskManager.getTasks());
         taskManager.deleteSubtasks();
-        System.out.println("Удалили сабтаски " + taskManager.getSubtasks());
+        System.out.println("Удалили сабтаски " + taskManager.getSubtasks()+taskManager.getEpics());
         taskManager.deleteEpics();
         System.out.println("Удалили эпики и связанные сабтаски " + taskManager.getSubtasks() + taskManager.getEpics());
 

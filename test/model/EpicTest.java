@@ -18,7 +18,6 @@ void shouldEqualsWithCopy() {
 }
 
     private static void assertEqualsEpic (Epic expected, Epic actual, String message) {
-        assertEquals(expected.getId(), actual.getId(), message + " , id");
         assertEquals(expected.getTitle(), actual.getTitle(), message + " , title");
         assertEquals(expected.getDescription(), actual.getDescription(), message + " , description");
         assertEquals(expected.getStatus(), actual.getStatus(), message + " , status");

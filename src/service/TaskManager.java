@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface TaskManager {
 
-
-
     //методы для Task
     ArrayList<Task> getTasks();
 
@@ -18,7 +16,7 @@ public interface TaskManager {
 
     Task createTask(Task task);
 
-    Task updateTask(Task task);
+    Task updateTask(Integer id, Task task);
 
     void deleteTaskByID(Integer id);
 
@@ -33,7 +31,7 @@ public interface TaskManager {
 
     Epic createEpic(Epic epic);
 
-    Epic updateEpic(Epic epic);
+    Epic updateEpic(Integer id, Epic epic);
 
     void deleteEpicByID(Integer epicId);
 
@@ -46,7 +44,7 @@ public interface TaskManager {
 
     SubTask createSubtask(SubTask subtask);
 
-    SubTask updateSubTask(SubTask subtask);
+    SubTask updateSubTask(Integer id, SubTask subtask);
 
     void deleteSubtasks();
 
