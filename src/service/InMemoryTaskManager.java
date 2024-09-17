@@ -21,8 +21,7 @@ public class InMemoryTaskManager implements TaskManager {
         this.subtasks = new HashMap<>();
     }
 
-    //ок будет если сделаю протектед? так как метод используется в тестах, для проверки его работы или мы его просто не тестируем?
-    protected int getIdCounter() {
+    private int getIdCounter() {
         return idCounter++;
     }
 
@@ -50,13 +49,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task updateTask(Integer id, Task task) {
-        if (tasks.containsKey(id)) {
-            Task oldTask = tasks.get(id);
-            oldTask.setTitle(task.getTitle());
-            oldTask.setDescription(task.getDescription());
-            oldTask.setStatus(task.getStatus());
-            return oldTask;
+    public Task updateTask(Task task) {
+        if (tasks.containsKey(task.getId())) {
+            tasks.put(task.getId(), task);
+            return task;
         }
         return null;
     }
@@ -108,9 +104,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic updateEpic(Integer id, Epic epic) {
-        if (epics.containsKey(id)) {
-            Epic oldEpic = epics.get(id);
+    public Epic updateEpic(Epic epic) {
+        if (epics.containsKey(epic.getId())) {
+            Epic oldEpic = epics.get(epic.getId());
             oldEpic.setTitle(epic.getTitle());
             oldEpic.setDescription(epic.getDescription());
             return oldEpic;
@@ -160,12 +156,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public SubTask updateSubTask(Integer id, SubTask subtask) {
-        if (subtasks.containsKey(id)) {
-            SubTask oldSubtask = subtasks.get(id);
-            oldSubtask.setTitle(subtask.getTitle());
-            oldSubtask.setDescription(subtask.getDescription());
-            oldSubtask.setStatus(subtask.getStatus());
+    public SubTask updateSubTask(SubTask subtask) {
+        if (subtasks.containsKey(subtask.getId())) {
+            subtasks.put(subtask.getId(), subtask);
             updateEpicStatus(subtask.getEpicId());
             return subtask;
         }

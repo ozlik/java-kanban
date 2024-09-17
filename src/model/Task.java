@@ -5,14 +5,13 @@ public class Task {
     private Integer id;
     private String title;
     private String description;
-    private TaskStatus status = TaskStatus.NEW; //здесь тоже добавила, чтобы если задачу создают без статуса, он проставлялся
+    private TaskStatus status;
     protected TaskType type = TaskType.TASK;
 
     public Task(String title, String description, TaskStatus status) {
         this.title = title;
         this.description = description;
         this.status = status;
-
     }
 
     public void setId(Integer id) {

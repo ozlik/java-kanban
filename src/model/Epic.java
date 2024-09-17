@@ -16,10 +16,6 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
-    protected void setType(TaskType type) {
-        this.type = TaskType.EPIC;
-    }
-
     public void addSubTask(Integer id) {
         this.epicSubtasksId.add(id);
     }

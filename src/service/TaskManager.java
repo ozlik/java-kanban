@@ -16,7 +16,7 @@ public interface TaskManager {
 
     Task createTask(Task task);
 
-    Task updateTask(Integer id, Task task);
+    Task updateTask(Task task);
 
     void deleteTaskByID(Integer id);
 
@@ -31,7 +31,7 @@ public interface TaskManager {
 
     Epic createEpic(Epic epic);
 
-    Epic updateEpic(Integer id, Epic epic);
+    Epic updateEpic(Epic epic);
 
     void deleteEpicByID(Integer epicId);
 
@@ -44,7 +44,7 @@ public interface TaskManager {
 
     SubTask createSubtask(SubTask subtask);
 
-    SubTask updateSubTask(Integer id, SubTask subtask);
+    SubTask updateSubTask(SubTask subtask);
 
     void deleteSubtasks();
 

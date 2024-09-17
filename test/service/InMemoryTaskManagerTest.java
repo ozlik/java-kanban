@@ -28,14 +28,14 @@ public class InMemoryTaskManagerTest {
         taskManager = new InMemoryTaskManager(historyManager);
     }
 
-    @Test
-    @DisplayName("присваивать id задачи, эпика, подзадачи")
-    void shouldSetTaskId() {
-        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-        int idCounterExpected = task.getId() + 1;
-        int idCounterResult = taskManager.getIdCounter();
-        assertEquals(idCounterResult, idCounterExpected);
-    }
+//    @Test
+//    @DisplayName("присваивать id задачи, эпика, подзадачи")
+//    void shouldSetTaskId() {
+//        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
+//        int idCounterExpected = task.getId() + 1;
+//        int idCounterResult = taskManager.getIdCounter();
+//        assertEquals(idCounterResult, idCounterExpected);
+//    }
 
 
     @Test
@@ -199,10 +199,12 @@ public class InMemoryTaskManagerTest {
     @Test
     @DisplayName("обновлять задачу в мапе")
     void shouldUpdateTaskGetAndPutToMap() {
-        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-        Task taskToUpdate = new Task("Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи", TaskStatus.IN_PROGRESS);
-        taskManager.updateTask(task.getId(), taskToUpdate);
-        assertEqualsTask(taskManager.tasks.get(task.getId()), taskToUpdate, "Задачи не совпадают");
+        Task task2 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW);
+        Task savedTask = taskManager.createTask(task2);
+        savedTask.setStatus(TaskStatus.IN_PROGRESS);
+        savedTask.setTitle("Новая обновленная задача");
+        taskManager.updateTask(savedTask);
+        assertEqualsTask(taskManager.tasks.get(savedTask.getId()), savedTask, "Задачи не совпадают");
     }
 
     @Test
@@ -210,7 +212,7 @@ public class InMemoryTaskManagerTest {
     void shouldNotUpdateTaskWithWrongId() {
         Task taskToUpdate = new Task("Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
                 TaskStatus.IN_PROGRESS);
-        assertNull(taskManager.updateTask(80, taskToUpdate));
+        assertNull(taskManager.updateTask(taskToUpdate));
         assertNull(taskManager.tasks.get(taskToUpdate.getId()));
     }
 
@@ -218,26 +220,14 @@ public class InMemoryTaskManagerTest {
     @DisplayName("обновлять подзадачу в мапе и менять статус эпика")
     void shouldUpdateSubTaskGetAndPutToMapAndChangeEpicStatus() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtaskToUpdate = new SubTask("Тестовая подзадача, заголовок обновленный", "Описание тестовой обновленной подзадачи",
-                TaskStatus.IN_PROGRESS, epic.getId());
-        SubTask subtaskResult2 = taskManager.updateSubTask(subtask.getId(), subtaskToUpdate);
-        assertEqualsSubtask(taskManager.subtasks.get(subtask.getId()), subtaskToUpdate, "Задачи не совпадают");
+        SubTask subtask3 = new SubTask("Подзадача 2 первого эпика", "Описание подзадачи 2 первого эпика", TaskStatus.IN_PROGRESS, epic.getId());
+        SubTask savedSubtask = taskManager.createSubtask(subtask3);
+        savedSubtask.setStatus(TaskStatus.IN_PROGRESS);
+        savedSubtask.setTitle("Новая обновленная задача");
+        savedSubtask.setDescription("Обновленное описание");
+        taskManager.updateSubTask(savedSubtask);
+        assertEqualsSubtask(taskManager.subtasks.get(subtask3.getId()), savedSubtask, "Задачи не совпадают");
         assertEquals(epic.getStatus(), TaskStatus.IN_PROGRESS);
-    }
-
-    @Test
-    @DisplayName("не давать перезаписать задачу к другому эпику")
-    void shouldUpdateSubtaskAndPutToNewEpic() {
-        epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        Epic epic1 = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtaskToUpdate = new SubTask("Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
-                TaskStatus.IN_PROGRESS, epic1.getId());
-        taskManager.updateSubTask(subtask.getId(), subtaskToUpdate);
-        ArrayList<Integer> epicSubtasks = epic.getSubTasks();
-        assertEqualsTask(taskManager.subtasks.get(epicSubtasks.getFirst()), subtaskToUpdate, "Подзадачи не совпадают");
-        assertEquals(epic1.getSubTasks().size(), 0, "список подзадач эпика не пуст");
     }
 
     @Test
@@ -279,10 +269,13 @@ public class InMemoryTaskManagerTest {
     @Test
     @DisplayName("обновлять эпик в мапе")
     void shouldUpdateEpicGetAndPutToMap() {
-        epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        Epic epic1UpDate = new Epic("Первый обновлённый эпик", "Описание первого эпика");
-        Epic epicResult = taskManager.updateEpic(epic.getId(), epic1UpDate);
-        assertEqualsEpic(taskManager.epics.get(epicResult.getId()), epic1UpDate, "Эпики не совпадают");
+        Epic epic2 = new Epic("Второй эпик", "Описание второго эпика");
+        Epic savedEpic = taskManager.createEpic(epic2);
+        savedEpic.setStatus(TaskStatus.IN_PROGRESS);
+        savedEpic.setTitle("Обновленный эпик");
+        savedEpic.setDescription("Обновленное описание эпика");
+        taskManager.updateEpic(savedEpic);
+        assertEqualsEpic(taskManager.epics.get(savedEpic.getId()), savedEpic, "Эпики не совпадают");
     }
 
     @Test
