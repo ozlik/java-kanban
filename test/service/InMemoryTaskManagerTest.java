@@ -105,7 +105,7 @@ public class InMemoryTaskManagerTest {
         task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
         Task task1 = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
         Task taskExpected = new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
-        Task taskExpected1 = new Task( "Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
+        Task taskExpected1 = new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
         ArrayList<Task> tasksResult2 = taskManager.getTasks();
         Task taskResult = tasksResult2.getFirst();
         Task taskResult1 = tasksResult2.get(1);
