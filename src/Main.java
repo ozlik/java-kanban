@@ -67,7 +67,7 @@ public class Main {
         taskManager.getTaskByID(9);
         taskManager.getTaskByID(10);
         taskManager.getTaskByID(11);
-
+        taskManager.getTaskByID(10);
         System.out.println("История" + taskManager.getHistory());
 
         taskManager.deleteTaskByID(0);

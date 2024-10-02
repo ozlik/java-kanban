@@ -60,3 +60,9 @@ UPD 29.09
 8. Добавить метод public void removeNode(Node node) в InMemoryHistoryManager
 9. Добавить метод List<Task> getTasks() в InMemoryHistoryManager
 10. Написать тесты на метод  void remove(int id) в InMemoryHistoryManagerTest
+
+UPD 02.10
+1. Сделать класс Node приватным. 
+2. Добавить предыдущий и следующий узлы в конструктор класса Node.
+3. Сделать методы linkLast и removeNode приватными. 
+4. Дописать тесты по удалению задач из истории. 
