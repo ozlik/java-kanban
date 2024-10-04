@@ -28,15 +28,6 @@ public class InMemoryTaskManagerTest {
         taskManager = new InMemoryTaskManager(historyManager);
     }
 
-//    @Test
-//    @DisplayName("присваивать id задачи, эпика, подзадачи")
-//    void shouldSetTaskId() {
-//        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-//        int idCounterExpected = task.getId() + 1;
-//        int idCounterResult = taskManager.getIdCounter();
-//        assertEquals(idCounterResult, idCounterExpected);
-//    }
-
 
     @Test
     @DisplayName("корректно передавать в мапу и из мапы созданную задачу")
@@ -83,7 +74,7 @@ public class InMemoryTaskManagerTest {
     @Test
     @DisplayName("передавать историю просмотра задач")
     void shouldReturnHistoryFromHistoryManager() {
-      task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
         taskManager = new InMemoryTaskManager(new HistoryManager() {
             @Override
             public void add(Task task) {
@@ -92,6 +83,11 @@ public class InMemoryTaskManagerTest {
             @Override
             public List<Task> getAll() {
                 return Collections.singletonList(task);
+            }
+
+            @Override
+            public void remove(int id) {
+
             }
         });
 
@@ -109,7 +105,7 @@ public class InMemoryTaskManagerTest {
         task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
         Task task1 = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
         Task taskExpected = new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
-        Task taskExpected1 = new Task( "Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
+        Task taskExpected1 = new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW);
         ArrayList<Task> tasksResult2 = taskManager.getTasks();
         Task taskResult = tasksResult2.getFirst();
         Task taskResult1 = tasksResult2.get(1);
@@ -380,6 +376,11 @@ public class InMemoryTaskManagerTest {
         @Override
         public List<Task> getAll() {
             return Collections.emptyList();
+        }
+
+        @Override
+        public void remove(int id) {
+
         }
     }
 }
