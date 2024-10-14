@@ -21,6 +21,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager fileBackUp = new FileBackedTaskManager(file);
+        fileBackUp.readFile();
+        return fileBackUp;
+    }
+
+    private void readFile() {
         int maxId = 0;
         int id;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
@@ -37,11 +42,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         maxId = id;
                     }
                     if (task.getType() == TaskType.TASK) {
-                        fileBackUp.putTask(id, task);
+                        putTask(id, task);
                     } else if (task.getType() == TaskType.SUBTASK) {
-                        fileBackUp.putSubtask(id, (SubTask) task);
+                        putSubtask(id, (SubTask) task);
                     } else if (task.getType() == TaskType.EPIC) {
-                        fileBackUp.putEpic(id, (Epic) task);
+                        putEpic(id, (Epic) task);
                     }
                     InMemoryTaskManager.setIdCounter(maxId);
                 }
@@ -49,7 +54,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла ошибка во время чтения файла.", e);
         }
-        return fileBackUp;
     }
 
 
