@@ -36,7 +36,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     fileBackUp.putTask(id, task);
                 } else if (task.getType() == TaskType.SUBTASK) {
                     fileBackUp.putSubtask(id, (SubTask) task);
-                } else if (task.getType() == TaskType.EPIC) {
+                } else if (task.getType() == TaskType.EPIC) { //не смогла разобраться с тем, как в эпик подзадачи обратно вернуть, как это лучше реализовать?
                     fileBackUp.putEpic(id, (Epic) task);
                 }
             }
