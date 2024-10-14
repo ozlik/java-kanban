@@ -20,6 +20,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager fileBackUp = new FileBackedTaskManager(file);
         int maxId = 0;
+        int id;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             bufferedReader.readLine();
             while (bufferedReader.ready()) {
@@ -28,16 +29,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     break;
                 }
                 Task task = fromString(line);
-                int id = task.getId();
-                if (maxId < id) {
-                    maxId = id;
-                }
-                if (task.getType() == TaskType.TASK) {
-                    fileBackUp.putTask(id, task);
-                } else if (task.getType() == TaskType.SUBTASK) {
-                    fileBackUp.putSubtask(id, (SubTask) task);
-                } else if (task.getType() == TaskType.EPIC) { //не смогла разобраться с тем, как в эпик подзадачи обратно вернуть, как это лучше реализовать?
-                    fileBackUp.putEpic(id, (Epic) task);
+                if (task != null) {
+                    id = task.getId();
+                    if (maxId < id) {
+                        maxId = id;
+                    }
+                    if (task.getType() == TaskType.TASK) {
+                        fileBackUp.putTask(id, task);
+                    } else if (task.getType() == TaskType.SUBTASK) {
+                        fileBackUp.putSubtask(id, (SubTask) task);
+                    } else if (task.getType() == TaskType.EPIC) { //не смогла разобраться с тем, как в эпик подзадачи обратно вернуть, как это лучше реализовать?
+                        fileBackUp.putEpic(id, (Epic) task);
+                    }
+                    InMemoryTaskManager.setIdCounter(maxId);
                 }
             }
         } catch (IOException e) {

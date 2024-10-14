@@ -25,6 +25,10 @@ public class InMemoryTaskManager implements TaskManager {
         return idCounter++;
     }
 
+    protected static void setIdCounter(int id) {
+        idCounter = id;
+    }
+
     //методы для Task
     @Override
     public ArrayList<Task> getTasks() {
