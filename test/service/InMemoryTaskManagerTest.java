@@ -59,7 +59,7 @@ public class InMemoryTaskManagerTest extends ManagersTest<InMemoryTaskManager> {
     void shouldAddCreatedSubtaskToEpic() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
-        ArrayList<Integer> epicSubtasks = epic.getSubTasks();
+        List<Integer> epicSubtasks = epic.getSubTasks();
         assertEqualsSubtask(taskManager.subtasks.get(epicSubtasks.getFirst()), subtask, "подзадачи не совпадают");
     }
 
@@ -335,7 +335,7 @@ public class InMemoryTaskManagerTest extends ManagersTest<InMemoryTaskManager> {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
         SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
-        ArrayList<Integer> epicSubtasks = epic.getSubTasks();
+        List<Integer> epicSubtasks = epic.getSubTasks();
         taskManager.deleteSubtaskById(subtask.getId());
         assertEquals(taskManager.subtasks.values().size(), 1, "в мапе больше одной подзадачи");
         assertEqualsSubtask(subtask1, taskManager.subtasks.get(subtask1.getId()), "подзадачи не совпадают");
