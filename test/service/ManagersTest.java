@@ -6,13 +6,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Managers должен")
-public class ManagersTest {
-
+public class ManagersTest<T extends TaskManager> {
+    TaskManager taskManager;
 
     @Test
     @DisplayName("должен создавать объект класса task")
     void shouldCreateTaskManager() {
-        TaskManager taskManager = Managers.getDefault();
+        taskManager = Managers.getDefault();
+
         assertNotNull(taskManager);
     }
 
@@ -20,6 +21,7 @@ public class ManagersTest {
     @DisplayName("должен создавать объект класса history")
     void shouldCreateHistoryManager() {
         HistoryManager historyManager = Managers.getDefaultHistory();
+
         assertNotNull(historyManager);
     }
 

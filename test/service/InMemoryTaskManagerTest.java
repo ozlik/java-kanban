@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("InMemoryTaskManager должен ")
-public class InMemoryTaskManagerTest {
+public class InMemoryTaskManagerTest extends ManagersTest<InMemoryTaskManager> {
     InMemoryTaskManager taskManager;
 
     Task task;
@@ -308,7 +308,7 @@ public class InMemoryTaskManagerTest {
     void shouldDeleteTaskFromMapById() {
         task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
         Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW));
-        taskManager.deleteTaskByID(task.getId());
+        taskManager.deleteTaskById(task.getId());
         assertEquals(taskManager.tasks.values().size(), 1, "в мапе не одна задача");
         assertEqualsTask(task2, taskManager.tasks.get(task2.getId()), "задачи не совпадают");
         assertNull(taskManager.tasks.get(task.getId()));
@@ -321,7 +321,7 @@ public class InMemoryTaskManagerTest {
         Epic epic1 = taskManager.createEpic(new Epic("Первый обновлённый эпик", "Описание первого эпика"));
         subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
         SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
-        taskManager.deleteEpicByID(epic.getId());
+        taskManager.deleteEpicById(epic.getId());
         assertEquals(taskManager.epics.values().size(), 1, "в мапе не один эпик");
         assertEqualsEpic(epic1, taskManager.epics.get(epic1.getId()), "эпики не совпадают");
         assertNull(taskManager.epics.get(epic.getId()));
@@ -336,7 +336,7 @@ public class InMemoryTaskManagerTest {
         subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
         SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
         ArrayList<Integer> epicSubtasks = epic.getSubTasks();
-        taskManager.deleteSubtaskByID(subtask.getId());
+        taskManager.deleteSubtaskById(subtask.getId());
         assertEquals(taskManager.subtasks.values().size(), 1, "в мапе больше одной подзадачи");
         assertEqualsSubtask(subtask1, taskManager.subtasks.get(subtask1.getId()), "подзадачи не совпадают");
         assertEquals(epicSubtasks.size(), 1, "в списке подзадач больше одной задачи или нет задач");
