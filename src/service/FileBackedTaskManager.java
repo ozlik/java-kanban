@@ -111,7 +111,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 List<Integer> epicSub = ((Epic) task).getSubTasks();
                 StringBuilder stringBuilder = new StringBuilder();
                 for (Integer integer : epicSub) {
-                    stringBuilder.append(Integer.toString(integer) + ",");
+                    stringBuilder.append(integer + ",");
                 }
                 String epicSubtasks = stringBuilder.toString();
                 return String.join(",", Integer.toString(task.getId()), "EPIC", task.getTitle(),
