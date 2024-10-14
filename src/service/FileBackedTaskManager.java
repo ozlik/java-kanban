@@ -4,6 +4,8 @@ import model.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
@@ -38,7 +40,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         fileBackUp.putTask(id, task);
                     } else if (task.getType() == TaskType.SUBTASK) {
                         fileBackUp.putSubtask(id, (SubTask) task);
-                    } else if (task.getType() == TaskType.EPIC) { //не смогла разобраться с тем, как в эпик подзадачи обратно вернуть, как это лучше реализовать?
+                    } else if (task.getType() == TaskType.EPIC) {
                         fileBackUp.putEpic(id, (Epic) task);
                     }
                     InMemoryTaskManager.setIdCounter(maxId);
@@ -52,7 +54,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
 
     public static Task fromString(String line) {
-        String[] splitTask = new String[6];
+        String[] splitTask;
         splitTask = line.split(",");
         int id = Integer.parseInt(splitTask[0]);
         TaskType type = TaskType.valueOf(splitTask[1]);
@@ -70,9 +72,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             task.setId(id);
             return task;
         } else if (type == TaskType.EPIC) {
+            List<Integer> epicSubtasks = new ArrayList<>();
+            for (int i = 5; i < splitTask.length; i++) {
+                epicSubtasks.add(Integer.parseInt(splitTask[i]));
+            }
             Epic epic = new Epic(title, description);
             epic.setId(id);
             epic.setStatus(status);
+            epic.setSubTasks(epicSubtasks);
             return epic;
         } else {
             System.out.println("Что-то пошло не так при формировании задачи из строки");
@@ -101,8 +108,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String type = String.valueOf(task.getType());
         switch (type) {
             case "EPIC":
+                List<Integer> epicSub = ((Epic) task).getSubTasks();
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Integer integer : epicSub) {
+                    stringBuilder.append(Integer.toString(integer) + ",");
+                }
+                String epicSubtasks = stringBuilder.toString();
                 return String.join(",", Integer.toString(task.getId()), "EPIC", task.getTitle(),
-                        task.getStatus().toString(), task.getDescription());
+                        task.getStatus().toString(), task.getDescription(), epicSubtasks);
             case "SUBTASK":
                 return String.join(",", Integer.toString(task.getId()), "SUBTASK", task.getTitle(),
                         task.getStatus().toString(), task.getDescription(), Integer.toString(((SubTask) task).getEpicId()));

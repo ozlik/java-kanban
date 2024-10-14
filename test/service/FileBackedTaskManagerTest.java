@@ -1,7 +1,5 @@
 package service;
 
-import model.Task;
-import model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +34,13 @@ public class FileBackedTaskManagerTest extends ManagersTest<FileBackedTaskManage
 
         assertEquals(Collections.emptyList(), emptyFileManager.getTasks());
     }
+
+//    @Test
+//    @DisplayName("загружать пустой файл")
+//    public void shouldLoadEmptyListOfTask() {
+//        FileBackedTaskManager loadEmptyFileManager = FileBackedTaskManager.loadFromFile(emptyFile);
+//        assertEquals(Collections.emptyList(), loadEmptyFileManager.getTasks());
+//    }
 
 //    @Test
 //    @DisplayName("загружать список задач из файл")
