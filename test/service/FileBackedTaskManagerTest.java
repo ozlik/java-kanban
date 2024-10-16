@@ -42,18 +42,18 @@ public class FileBackedTaskManagerTest extends ManagersTest<FileBackedTaskManage
         assertEquals(Collections.emptyList(), loadEmptyFileManager.getTasks());
     }
 
-//    @Test
-//    @DisplayName("загружать список задач из файла")
-//    public void shouldLoadListOfTask() {
-//        Task task0 = fileManager.createTask(new Task("Заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-//        Task task1 = fileManager.createTask(new Task("Заголовок 2", "Описание тестовой задачи2", TaskStatus.NEW));
-//
-//        FileBackedTaskManager loadFileManager = FileBackedTaskManager.loadFromFile(file);
-//
-//        assertEquals(loadFileManager.getTasks().size(), 2);
-//        assertEqualsTask(task0, loadFileManager.getTaskByID(0), "Задачи не совпадают");
-//        assertEqualsTask(task1, loadFileManager.getTaskByID(1), "Задачи не совпадают");
-//    }
+    @Test
+    @DisplayName("загружать список задач из файла")
+    public void shouldLoadListOfTask() {
+        Task task0 = fileManager.createTask(new Task("Заголовок", "Описание тестовой задачи", TaskStatus.NEW));
+        Task task1 = fileManager.createTask(new Task("Заголовок 2", "Описание тестовой задачи2", TaskStatus.NEW));
+
+        FileBackedTaskManager loadFileManager = FileBackedTaskManager.loadFromFile(file);
+
+        assertEquals(loadFileManager.getTasks().size(), 2);
+        assertEqualsTask(task0, loadFileManager.getTaskByID(0), "Задачи не совпадают");
+        assertEqualsTask(task1, loadFileManager.getTaskByID(1), "Задачи не совпадают");
+    }
 
     private static void assertEqualsTask(Task expected, Task actual, String message) {
         assertEquals(expected.getTitle(), actual.getTitle(), message + " , title");

@@ -1,17 +1,13 @@
-
 import model.*;
 import service.*;
 
 import java.io.File;
-import java.nio.file.Path;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Path path = Path.of("testFile.csv");
-
-        File file1 = new File(String.valueOf(path));
+        File file1 = new File("testFile.csv");
         FileBackedTaskManager taskManager = new FileBackedTaskManager(file1);
 
         Task task1 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW);

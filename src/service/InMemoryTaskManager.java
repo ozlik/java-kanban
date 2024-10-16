@@ -25,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
         return idCounter++;
     }
 
-    protected static void setIdCounter(int id) {
+    protected void setIdCounter(int id) {
         idCounter = id;
     }
 
@@ -61,8 +61,7 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
-    @Override
-    public Task addTask(Integer id, Task task) {
+    protected Task addTask(Integer id, Task task) {
         tasks.put(id, task);
         return task;
     }
@@ -128,8 +127,7 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
-    @Override
-    public Epic addEpic(Integer id, Epic epic) {
+    protected Epic addEpic(Integer id, Epic epic) {
         epics.put(id, epic);
         return epic;
     }
@@ -195,8 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
-    @Override
-    public SubTask addSubtask(Integer id, SubTask subtask) {
+    protected SubTask addSubtask(Integer id, SubTask subtask) {
         subtasks.put(id, subtask);
         return subtask;
     }
