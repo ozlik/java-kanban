@@ -51,8 +51,8 @@ public class FileBackedTaskManagerTest extends ManagersTest<FileBackedTaskManage
         FileBackedTaskManager loadFileManager = FileBackedTaskManager.loadFromFile(file);
 
         assertEquals(loadFileManager.getTasks().size(), 2);
-        assertEqualsTask(task0, loadFileManager.getTaskByID(0), "Задачи не совпадают");
-        assertEqualsTask(task1, loadFileManager.getTaskByID(1), "Задачи не совпадают");
+        assertEqualsTask(task0, loadFileManager.getTaskByID(task0.getId()), "Задачи не совпадают");
+        assertEqualsTask(task1, loadFileManager.getTaskByID(task1.getId()), "Задачи не совпадают");
     }
 
     private static void assertEqualsTask(Task expected, Task actual, String message) {
