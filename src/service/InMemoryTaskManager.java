@@ -37,8 +37,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskByID(Integer id) {
-        historyManager.add(tasks.get(id));
-        return tasks.get(id);
+        if (tasks.get(id) != null) {
+            historyManager.add(tasks.get(id));
+            return tasks.get(id);
+        }
+        return null;
     }
 
     @Override
@@ -62,8 +65,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected Task addTask(Integer id, Task task) {
-        tasks.put(id, task);
-        return task;
+        if (task != null) {
+            tasks.put(id, task);
+            return task;
+        }
+        return null;
     }
 
     @Override
@@ -101,8 +107,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpicByID(Integer id) {
-        historyManager.add(epics.get(id));
-        return epics.get(id);
+        if (epics.get(id) != null) {
+            historyManager.add(epics.get(id));
+            return epics.get(id);
+        }
+        return null;
     }
 
     @Override
@@ -128,8 +137,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected Epic addEpic(Integer id, Epic epic) {
-        epics.put(id, epic);
-        return epic;
+        if (epic != null) {
+            epics.put(id, epic);
+            return epic;
+        }
+        return null;
     }
 
     @Override
@@ -165,8 +177,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask getSubtaskById(Integer id) {
-        historyManager.add(subtasks.get(id));
-        return subtasks.get(id);
+        if (subtasks.get(id) != null) {
+            historyManager.add(subtasks.get(id));
+            return subtasks.get(id);
+        }
+        return null;
     }
 
     @Override
@@ -194,8 +209,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected SubTask addSubtask(Integer id, SubTask subtask) {
-        subtasks.put(id, subtask);
-        return subtask;
+        if (subtask != null) {
+            subtasks.put(id, subtask);
+            return subtask;
+        }
+        return null;
     }
 
     private void updateEpicStatus(Integer id) {

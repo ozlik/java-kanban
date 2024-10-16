@@ -46,23 +46,26 @@ public class StringConverter {
 
     public static String taskToString(Task task) {
         String type = String.valueOf(task.getType());
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(task.getId()).append(",");
+        stringBuilder.append(type).append(",");
+        stringBuilder.append(task.getTitle()).append(",");
+        stringBuilder.append(task.getStatus().toString()).append(",");
+        stringBuilder.append(task.getDescription());
         switch (type) {
             case "EPIC":
                 List<Integer> epicSub = ((Epic) task).getSubTasks();
-                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(",");
                 for (Integer integer : epicSub) {
-                    stringBuilder.append(integer + ",");
+                    stringBuilder.append(integer).append(",");
                 }
-                String epicSubtasks = stringBuilder.toString();
-//                String epicSubtasks = String.join(",", epicSub.toString());
-                return String.join(",", Integer.toString(task.getId()), "EPIC", task.getTitle(),
-                        task.getStatus().toString(), task.getDescription(), epicSubtasks);
+                return stringBuilder.toString();
             case "SUBTASK":
-                return String.join(",", Integer.toString(task.getId()), "SUBTASK", task.getTitle(),
-                        task.getStatus().toString(), task.getDescription(), Integer.toString(((SubTask) task).getEpicId()));
+                stringBuilder.append(",");
+                stringBuilder.append(((SubTask) task).getEpicId());
+                return stringBuilder.toString();
             case "TASK":
-                return String.join(",", Integer.toString(task.getId()), "TASK", task.getTitle(),
-                        task.getStatus().toString(), task.getDescription());
+                return stringBuilder.toString();
             default:
                 return null;
         }
