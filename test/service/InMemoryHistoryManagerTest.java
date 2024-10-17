@@ -110,12 +110,12 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(task);
 
         assertEquals(historyManager.getAll().size(), 1, "в историю добавлены не все задачи");
-        assertEqualsTask(historyManager.getAll().get(0), task, "задачи не совпадают");
+        assertEqualsTask(historyManager.getAll().getFirst(), task, "задачи не совпадают");
 
         historyManager.add(task);
 
         assertEquals(historyManager.getAll().size(), 1, "в историю добавлены не все задачи");
-        assertEqualsTask(historyManager.getAll().get(0), task, "задачи не совпадают");
+        assertEqualsTask(historyManager.getAll().getFirst(), task, "задачи не совпадают");
     }
 
     private static void assertEqualsTask(Task expected, Task actual, String message) {

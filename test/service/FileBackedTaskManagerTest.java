@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,13 +14,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("FileBackedTaskManagerTest должен ")
 public class FileBackedTaskManagerTest extends ManagersTest<FileBackedTaskManager> {
     File file;
-    Path path = Path.of("testFile.csv");
     FileBackedTaskManager fileManager;
 
+    @Override
+    FileBackedTaskManager createManager() {
+        return new FileBackedTaskManager();
+    }
 
     @BeforeEach
     void init() {
-        file = new File(String.valueOf(path));
+        file = new File("src/resources/testFile.csv");
         fileManager = new FileBackedTaskManager(file);
 
     }

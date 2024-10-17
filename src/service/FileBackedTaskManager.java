@@ -17,12 +17,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public FileBackedTaskManager() {
         super(Managers.getDefaultHistory());
-        this.file = new File("testFile.csv");
+        this.file = new File("src/resources/File.csv");
     }
 
     public FileBackedTaskManager(HistoryManager historyManager) {
         super(historyManager);
-        this.file = new File("testFile.csv");
+        this.file = new File("src/resources/File.csv");
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {

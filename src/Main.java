@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        File file1 = new File("testFile.csv");
+        File file1 = new File("src/resources/File.csv");
         FileBackedTaskManager taskManager = new FileBackedTaskManager(file1);
 
         Task task1 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW);
