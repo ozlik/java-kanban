@@ -18,12 +18,12 @@ public class FileBackedTaskManagerTest extends ManagersTest<FileBackedTaskManage
 
     @Override
     FileBackedTaskManager createManager() {
-        return new FileBackedTaskManager(new File("src/resources/testFile.csv"));
+        return new FileBackedTaskManager(new File("testFile.csv"));
     }
 
     @BeforeEach
     void init() {
-        file = new File("src/resources/testFile.csv");
+        file = new File("testFile.csv");
         fileManager = new FileBackedTaskManager(file);
 
     }
