@@ -8,9 +8,9 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    protected HashMap<Integer, Task> tasks;
-    protected HashMap<Integer, Epic> epics;
-    protected HashMap<Integer, SubTask> subtasks;
+    final HashMap<Integer, Task> tasks;
+    final HashMap<Integer, Epic> epics;
+    final HashMap<Integer, SubTask> subtasks;
     private static int idCounter = 0;
     private final HistoryManager historyManager;
 
@@ -25,6 +25,10 @@ public class InMemoryTaskManager implements TaskManager {
         return idCounter++;
     }
 
+    protected void setIdCounter(int id) {
+        idCounter = id;
+    }
+
     //методы для Task
     @Override
     public ArrayList<Task> getTasks() {
@@ -33,8 +37,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskByID(Integer id) {
-        historyManager.add(tasks.get(id));
-        return tasks.get(id);
+        if (tasks.get(id) != null) {
+            historyManager.add(tasks.get(id));
+            return tasks.get(id);
+        }
+        return null;
     }
 
     @Override
@@ -57,8 +64,16 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
+    protected Task addTask(Integer id, Task task) {
+        if (task != null) {
+            tasks.put(id, task);
+            return task;
+        }
+        return null;
+    }
+
     @Override
-    public void deleteTaskByID(Integer id) {
+    public void deleteTaskById(Integer id) {
         tasks.remove(id);
         historyManager.remove(id);
     }
@@ -92,8 +107,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpicByID(Integer id) {
-        historyManager.add(epics.get(id));
-        return epics.get(id);
+        if (epics.get(id) != null) {
+            historyManager.add(epics.get(id));
+            return epics.get(id);
+        }
+        return null;
     }
 
     @Override
@@ -118,12 +136,21 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
+    protected Epic addEpic(Integer id, Epic epic) {
+        if (epic != null) {
+            epics.put(id, epic);
+            return epic;
+        }
+        return null;
+    }
+
     @Override
-    public void deleteEpicByID(Integer epicId) {
+    public void deleteEpicById(Integer epicId) {
         Epic epic = epics.get(epicId);
-        ArrayList<Integer> subtasksToRemove = epic.getSubTasks();
+        List<Integer> subtasksToRemove = epic.getSubTasks();
         historyManager.remove(epicId);
         epics.remove(epicId);
+        epic.deleteSubtasks();
 
         for (Integer id : subtasksToRemove) {
             subtasks.remove(id);
@@ -135,6 +162,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteEpics() {
         for (Integer id : epics.keySet()) {
             historyManager.remove(id);
+            epics.get(id).deleteSubtasks();
         }
 
         for (Integer id : subtasks.keySet()) {
@@ -151,8 +179,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask getSubtaskById(Integer id) {
-        historyManager.add(subtasks.get(id));
-        return subtasks.get(id);
+        if (subtasks.get(id) != null) {
+            historyManager.add(subtasks.get(id));
+            return subtasks.get(id);
+        }
+        return null;
     }
 
     @Override
@@ -179,11 +210,19 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
+    protected SubTask addSubtask(Integer id, SubTask subtask) {
+        if (subtask != null) {
+            subtasks.put(id, subtask);
+            return subtask;
+        }
+        return null;
+    }
+
     private void updateEpicStatus(Integer id) {
         Epic epic = epics.get(id);
         Integer doneCount = 0;
         Integer newCount = 0;
-        ArrayList<Integer> subtaskToCheck = epic.getSubTasks();
+        List<Integer> subtaskToCheck = epic.getSubTasks();
         if (!subtaskToCheck.isEmpty()) {
             for (Integer i : subtaskToCheck) {
                 SubTask subtask = subtasks.get(i);
@@ -220,7 +259,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteSubtaskByID(Integer id) {
+    public void deleteSubtaskById(Integer id) {
         SubTask subtask = subtasks.get(id);
         Epic epic = epics.get(subtask.getEpicId());
         epic.deleteSubTask(id);
