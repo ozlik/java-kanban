@@ -57,9 +57,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     taskManager.setIdCounter(maxId);
                 }
             }
-            if (!subtasks.isEmpty()){
-                for(SubTask s: subtasks.values()) {
-                   Epic epic = epics.get(s.getEpicId());
+            if (!subtasks.isEmpty()) {
+                for (SubTask s : subtasks.values()) {
+                    Epic epic = epics.get(s.getEpicId());
                     epic.addSubTask(s.getId());
                 }
             }
