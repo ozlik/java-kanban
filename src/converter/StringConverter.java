@@ -53,21 +53,15 @@ public class StringConverter {
         stringBuilder.append(task.getStatus().toString()).append(",");
         stringBuilder.append(task.getDescription());
         switch (type) {
-            case "EPIC":
-                List<Integer> epicSub = ((Epic) task).getSubTasks();
-                stringBuilder.append(",");
-                for (Integer integer : epicSub) {
-                    stringBuilder.append(integer).append(",");
-                }
+            case "EPIC", "TASK":
                 return stringBuilder.toString();
             case "SUBTASK":
                 stringBuilder.append(",");
                 stringBuilder.append(((SubTask) task).getEpicId());
                 return stringBuilder.toString();
-            case "TASK":
-                return stringBuilder.toString();
             default:
                 return null;
         }
+
     }
 }

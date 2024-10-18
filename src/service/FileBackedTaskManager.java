@@ -57,8 +57,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     taskManager.setIdCounter(maxId);
                 }
             }
+            if (!subtasks.isEmpty()){
+                for(SubTask s: subtasks.values()) {
+                   Epic epic = epics.get(s.getEpicId());
+                    epic.addSubTask(s.getId());
+                }
+            }
         } catch (IOException e) {
-            throw new ManagerSaveException("Произошла ошибка во время чтения файла.", e);
+            throw new ManagerSaveException("Произошла ошибка во время чтения файла." + file.getAbsolutePath(), e);
         }
     }
 
@@ -75,7 +81,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 bufferedWriter.write(StringConverter.taskToString(epic) + "\n");
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("Произошла ошибка во время записи файла.", e);
+            throw new ManagerSaveException("Произошла ошибка во время записи файла." + file.getAbsolutePath(), e);
         }
     }
 
