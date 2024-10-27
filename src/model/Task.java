@@ -1,6 +1,5 @@
 package model;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Task {
@@ -20,6 +19,7 @@ public class Task {
         this.duration = duration;
         this.startTime = startTime;
     }
+
     public Task(String title, String description, TaskStatus status, int duration) {
         this.title = title;
         this.description = description;
