@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,8 +48,8 @@ public class FileBackedTaskManagerTest extends ManagersTest<FileBackedTaskManage
     @Test
     @DisplayName("загружать список задач из файла")
     public void shouldLoadListOfTask() {
-        Task task0 = fileManager.createTask(new Task("Заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-        Task task1 = fileManager.createTask(new Task("Заголовок 2", "Описание тестовой задачи2", TaskStatus.NEW));
+        Task task0 = fileManager.createTask(new Task("Заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 9, 10)));
+        Task task1 = fileManager.createTask(new Task("Заголовок 2", "Описание тестовой задачи2", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 5, 10)));
 
         FileBackedTaskManager loadFileManager = FileBackedTaskManager.loadFromFile(file);
 
