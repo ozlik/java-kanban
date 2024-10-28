@@ -23,6 +23,8 @@ public class Main {
 //      в чем может быть проблема?
         taskManager.createSubtask(subtask2);
 
+        System.out.println(taskManager.getSubTaskByEpic(1));
+
         System.out.println(taskManager.getPrioritizedTasks());
 
         FileBackedTaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file1);
