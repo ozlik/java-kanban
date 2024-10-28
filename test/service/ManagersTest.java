@@ -187,19 +187,19 @@ public abstract class ManagersTest<T extends TaskManager> {
         assertEqualsEpic(epic, epicResult, "эпики не совпадают");
     }
 
-//    @Test
-//    @DisplayName("обновлять задачу в мапе")
-//    void shouldUpdateTaskGetAndPutToMap() {
-//        Task task2 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 13, 10));
-//        Task savedTask = taskManager.createTask(task2);
-//        savedTask.setStatus(TaskStatus.IN_PROGRESS);
-//        savedTask.setTitle("Новая обновленная задача");
-//
-//        taskManager.updateTask(savedTask);
-//
-//        List<Task> tasks = taskManager.getTasks();
-//        assertEqualsTask(savedTask, tasks.getFirst(), "Задачи не совпадают");
-//    }
+    @Test
+    @DisplayName("обновлять задачу в мапе")
+    void shouldUpdateTaskGetAndPutToMap() {
+        Task task2 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 13, 10));
+        Task savedTask = taskManager.createTask(task2);
+        savedTask.setStatus(TaskStatus.IN_PROGRESS);
+        savedTask.setTitle("Новая обновленная задача");
+
+        taskManager.updateTask(savedTask);
+
+        List<Task> tasks = taskManager.getTasks();
+        assertEqualsTask(savedTask, tasks.getFirst(), "Задачи не совпадают");
+    }
 
     @Test
     @DisplayName("отдавать ноль при попытке обновить несуществующую задачу")
@@ -210,32 +210,32 @@ public abstract class ManagersTest<T extends TaskManager> {
         assertNull(taskManager.updateTask(taskToUpdate));
     }
 
-//    @Test
-//    @DisplayName("менять статус эпика при обновлении подзадачи")
-//    void shouldUpdateSubTaskGetAndPutToMapAndChangeEpicStatus() {
-//        epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-//        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 15, 10), epic.getId()));
-//        subtask.setStatus(TaskStatus.IN_PROGRESS);
-//        subtask.setTitle("Новая обновленная задача");
-//
-//        taskManager.updateSubTask(subtask);
-//
-//        assertEquals(epic.getStatus(), TaskStatus.IN_PROGRESS, "статус эпика не обновился");
-//    }
+    @Test
+    @DisplayName("менять статус эпика при обновлении подзадачи")
+    void shouldUpdateSubTaskGetAndPutToMapAndChangeEpicStatus() {
+        epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 15, 10), epic.getId()));
+        subtask.setStatus(TaskStatus.IN_PROGRESS);
+        subtask.setTitle("Новая обновленная задача");
 
-//    @Test
-//    @DisplayName("обновлять подзадачу")
-//    void shouldUpdateSubTask() {
-//        epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-//        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 14, 10), epic.getId()));
-//        subtask.setStatus(TaskStatus.IN_PROGRESS);
-//        subtask.setTitle("Новая обновленная задача");
-//
-//        taskManager.updateSubTask(subtask);
-//
-//        assertEquals(TaskStatus.IN_PROGRESS, subtask.getStatus(), "статус эпика не обновился");
-//        assertEquals("Новая обновленная задача", subtask.getTitle(), "статус эпика не обновился");
-//    }
+        taskManager.updateSubTask(subtask);
+
+        assertEquals(epic.getStatus(), TaskStatus.IN_PROGRESS, "статус эпика не обновился");
+    }
+
+    @Test
+    @DisplayName("обновлять подзадачу")
+    void shouldUpdateSubTask() {
+        epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 14, 10), epic.getId()));
+        subtask.setStatus(TaskStatus.IN_PROGRESS);
+        subtask.setTitle("Новая обновленная задача");
+
+        taskManager.updateSubTask(subtask);
+
+        assertEquals(TaskStatus.IN_PROGRESS, subtask.getStatus(), "статус эпика не обновился");
+        assertEquals("Новая обновленная задача", subtask.getTitle(), "статус эпика не обновился");
+    }
 
     @Test
     @DisplayName("обновлять статус эпика на progress при добавлении к эпику позадач с аналогичным статусом")

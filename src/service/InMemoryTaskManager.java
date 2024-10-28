@@ -68,10 +68,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
-            taskTimeValidation(task);
-            tasks.put(task.getId(), task);
             prioritizedTasks.remove(task);
+            taskTimeValidation(task);
             prioritizedTasks.add(task);
+            tasks.put(task.getId(), task);
             return task;
         }
         return null;
@@ -224,10 +224,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public SubTask updateSubTask(SubTask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
-            taskTimeValidation(subtask);
-            subtasks.put(subtask.getId(), subtask);
             prioritizedTasks.remove(subtask);
+            taskTimeValidation(subtask);
             prioritizedTasks.add(subtask);
+            subtasks.put(subtask.getId(), subtask);
             updateEpicStatus(subtask.getEpicId());
             updateEpicTime(subtask.getEpicId());
             return subtask;
