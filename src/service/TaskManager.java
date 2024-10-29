@@ -6,13 +6,14 @@ import model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskManager {
 
     //методы для Task
     ArrayList<Task> getTasks();
 
-    Task getTaskByID(Integer id);
+    Optional<Task> getTaskByID(Integer id);
 
     Task createTask(Task task);
 
@@ -27,7 +28,7 @@ public interface TaskManager {
 
     ArrayList<SubTask> getSubTaskByEpic(Integer id);
 
-    Epic getEpicByID(Integer id);
+    Optional<Epic> getEpicByID(Integer id);
 
     Epic createEpic(Epic epic);
 
@@ -40,7 +41,7 @@ public interface TaskManager {
     //методы для Subtask
     ArrayList<SubTask> getSubtasks();
 
-    SubTask getSubtaskById(Integer id);
+    Optional<SubTask> getSubtaskById(Integer id);
 
     SubTask createSubtask(SubTask subtask);
 

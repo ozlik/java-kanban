@@ -3,6 +3,7 @@ package service;
 import model.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -13,15 +14,8 @@ public class InMemoryTaskManager implements TaskManager {
     final HashMap<Integer, SubTask> subtasks;
     private static int idCounter = 0;
     private final HistoryManager historyManager;
-    private final Set<Task> prioritizedTasks = new TreeSet<>(
-            Comparator.comparing(Task::getStartTime,
-                    Comparator.nullsLast(Comparator.naturalOrder()))
-    );
-
-    @Override
-    public List<Task> getPrioritizedTasks() {
-        return new ArrayList<>(prioritizedTasks);
-    }
+    TaskScheduler taskScheduler = new TaskScheduler();
+    private Map<LocalDateTime, Boolean> timeSlots = taskScheduler.scheduleTimeSlots();
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -38,6 +32,16 @@ public class InMemoryTaskManager implements TaskManager {
         idCounter = id;
     }
 
+    private final Set<Task> prioritizedTasks = new TreeSet<>(
+            Comparator.comparing(Task::getStartTime,
+                    Comparator.nullsLast(Comparator.naturalOrder()))
+    );
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
+    }
+
     //методы для Task
     @Override
     public ArrayList<Task> getTasks() {
@@ -45,12 +49,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTaskByID(Integer id) {
+    public Optional<Task> getTaskByID(Integer id) {
         if (tasks.get(id) != null) {
             historyManager.add(tasks.get(id));
-            return tasks.get(id);
         }
-        return null;
+        return Optional.ofNullable(tasks.get(id));
     }
 
     @Override
@@ -122,12 +125,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic getEpicByID(Integer id) {
+    public Optional<Epic> getEpicByID(Integer id) {
         if (epics.get(id) != null) {
             historyManager.add(epics.get(id));
-            return epics.get(id);
         }
-        return null;
+        return Optional.ofNullable(epics.get(id));
     }
 
     @Override
@@ -193,12 +195,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public SubTask getSubtaskById(Integer id) {
+    public Optional<SubTask> getSubtaskById(Integer id) {
         if (subtasks.get(id) != null) {
             historyManager.add(subtasks.get(id));
-            return subtasks.get(id);
         }
-        return null;
+        return Optional.ofNullable(subtasks.get(id));
     }
 
     @Override
@@ -268,14 +269,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void updateEpicTime(Integer id) {
-        Epic epic = getEpicByID(id);
+        Epic epic = getEpicByID(id).get();
         epic.setDuration(calculateEpicDuration(id));
         epic.setStartTime(calculateEpicStartTime(id));
         epic.setEndTime(calculateEpicEndTime(id));
     }
 
     private int calculateEpicDuration(Integer id) {
-        Epic epic = getEpicByID(id);
+        Epic epic = getEpicByID(id).get();
 
         return epic.getSubTasks().stream()
                 .mapToInt(subtaskId -> subtasks.get(subtaskId).getDuration())
@@ -283,7 +284,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private LocalDateTime calculateEpicStartTime(Integer id) {
-        Epic epic = getEpicByID(id);
+        Epic epic = getEpicByID(id).get();
         return epic.getSubTasks().stream()
                 .map(subtasks::get)
                 .map(SubTask::getStartTime)
@@ -292,9 +293,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private LocalDateTime calculateEpicEndTime(Integer id) {
-        Epic epic = getEpicByID(id);
+        Epic epic = getEpicByID(id).get();
         return epic.getSubTasks().stream()
-                .map(subtaskId -> subtasks.get(subtaskId))
+                .map(subtasks::get)
                 .map(SubTask::getEndTime)
                 .max(LocalDateTime::compareTo)
                 .orElse(epic.getStartTime());
@@ -307,24 +308,24 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private boolean isTaskOverlap(Task task) {
-        if (task.getStartTime() != null) {
-            for (Task taskToCompare : prioritizedTasks) {
-                if (taskToCompare.getStartTime() != null) {
-                    if (
-                            (taskToCompare.getStartTime().equals(task.getStartTime())
-                                    && taskToCompare.getEndTime().equals(task.getEndTime()))
-                                    || (taskToCompare.getStartTime().isBefore(task.getStartTime())
-                                    && (taskToCompare.getEndTime().isAfter(task.getStartTime()))
-                                    || (taskToCompare.getStartTime().isAfter(task.getStartTime()))
-                                    && (taskToCompare.getStartTime().isBefore(task.getEndTime())))
-                    ) {
-                        return true;
-                    }
-                }
+    private boolean isTaskOverlap(Task task) { // Проверяем на занятость интервала
+        LocalDateTime startTime = task.getStartTime().truncatedTo(ChronoUnit.MINUTES);
+        LocalDateTime endTime = task.getEndTime().truncatedTo(ChronoUnit.MINUTES);
+        LocalDateTime startTimeRoundUp = taskScheduler.roundUpTime(startTime);
+        LocalDateTime endTimeRoundUp = taskScheduler.roundUpTime(endTime);
+        while (startTimeRoundUp.isBefore(endTimeRoundUp)) {
+            if (timeSlots.get(startTimeRoundUp)) {
+                return true; // Пересечение найдено
+            } else {
+                updateSchedule(startTimeRoundUp);
+                startTimeRoundUp = startTimeRoundUp.plusMinutes(15); // Переходим к следующему 15-минутному интервалу
             }
         }
         return false;
+    }
+
+    private void updateSchedule(LocalDateTime time) {
+        timeSlots.put(time, true);
     }
 
     @Override
