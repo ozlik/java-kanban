@@ -3,7 +3,6 @@ package service;
 import model.*;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,13 +112,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getSubTaskByEpic(Integer id) {
+    public List<SubTask> getSubTaskByEpic(Integer id) {
         if (epics.containsKey(id)) {
             Epic epic = epics.get(id);
             // Используем Stream для получения списка SubTask
             return epic.getSubTasks().stream()
                     .map(subtasks::get)
-                    .collect(Collectors.toCollection(ArrayList::new)); // собираем результат в ArrayList
+                    .toList(); // собираем результат в ArrayList
         }
         return new ArrayList<>();
     }
@@ -301,18 +300,15 @@ public class InMemoryTaskManager implements TaskManager {
                 .orElse(epic.getStartTime());
     }
 
-    public void taskTimeValidation(Task task) {
-        boolean isTaskOverlap = isTaskOverlap(task);
-        if (isTaskOverlap) {
+    private void taskTimeValidation(Task task) {
+        if (isTaskOverlap(task)) {
             throw new ManagerValidationException("Время задачи пересекается с существующей");
         }
     }
 
     private boolean isTaskOverlap(Task task) { // Проверяем на занятость интервала
-        LocalDateTime startTime = task.getStartTime().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime endTime = task.getEndTime().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime startTimeRoundUp = taskScheduler.roundUpTime(startTime);
-        LocalDateTime endTimeRoundUp = taskScheduler.roundUpTime(endTime);
+        LocalDateTime startTimeRoundUp = taskScheduler.roundUpTime(task.getStartTime());
+        LocalDateTime endTimeRoundUp = taskScheduler.roundUpTime(task.getEndTime());
         while (startTimeRoundUp.isBefore(endTimeRoundUp)) {
             if (timeSlots.get(startTimeRoundUp)) {
                 return true; // Пересечение найдено

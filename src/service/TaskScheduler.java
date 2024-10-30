@@ -1,6 +1,7 @@
 package service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,10 +21,11 @@ public class TaskScheduler {
     }
 
     public LocalDateTime roundUpTime(LocalDateTime time) {
-        int remainder = time.getMinute() % 15;
+        LocalDateTime timeWithoutSeconds = time.truncatedTo(ChronoUnit.MINUTES);
+        int remainder = timeWithoutSeconds.getMinute() % 15;
         if (remainder >= 7) {
-            return time.plusMinutes(15 - remainder);
+            return timeWithoutSeconds.plusMinutes(15 - remainder);
         }
-        return time.minusMinutes(remainder);
+        return timeWithoutSeconds.minusMinutes(remainder);
     }
 }

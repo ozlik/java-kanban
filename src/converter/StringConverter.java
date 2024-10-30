@@ -3,10 +3,12 @@ package converter;
 import model.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StringConverter {
+    static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static Task taskFromString(String line) {
         String[] splitTask;
@@ -17,8 +19,8 @@ public class StringConverter {
         TaskStatus status = TaskStatus.valueOf(splitTask[3]);
         String description = splitTask[4];
         int duration = Integer.parseInt(splitTask[5]);
-        LocalDateTime startTime = LocalDateTime.parse(splitTask[6]);
-        LocalDateTime endTime = LocalDateTime.parse(splitTask[7]);
+        LocalDateTime startTime = LocalDateTime.parse(splitTask[6], formatter);
+        LocalDateTime endTime = LocalDateTime.parse(splitTask[7], formatter);
         switch (type) {
             case SUBTASK -> {
                 int epicId = Integer.parseInt(splitTask[8]);
@@ -52,25 +54,14 @@ public class StringConverter {
 
     public static String taskToString(Task task) {
         String type = String.valueOf(task.getType());
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(task.getId()).append(",");
-        stringBuilder.append(type).append(",");
-        stringBuilder.append(task.getTitle()).append(",");
-        stringBuilder.append(task.getStatus().toString()).append(",");
-        stringBuilder.append(task.getDescription()).append(",");
-        stringBuilder.append(task.getDuration()).append(",");
-        stringBuilder.append(task.getStartTime()).append(",");
-        stringBuilder.append(task.getEndTime());
-        switch (type) {
-            case "EPIC", "TASK":
-                return stringBuilder.toString();
-            case "SUBTASK":
-                stringBuilder.append(",");
-                stringBuilder.append(((SubTask) task).getEpicId());
-                return stringBuilder.toString();
-            default:
-                return null;
-        }
-
+        return switch (type) {
+            case "EPIC", "TASK" -> String.join(",", Integer.toString(task.getId()), type, task.getTitle(),
+                    task.getStatus().toString(), task.getDescription(), Integer.toString(task.getDuration()),
+                    task.getStartTime().format(formatter), task.getEndTime().format(formatter));
+            case "SUBTASK" -> String.join(",", Integer.toString(task.getId()), type, task.getTitle(),
+                    task.getStatus().toString(), task.getDescription(), Integer.toString(task.getDuration()),
+                    task.getStartTime().format(formatter), task.getEndTime().format(formatter), Integer.toString(((SubTask) task).getEpicId()));
+            default -> null;
+        };
     }
 }
