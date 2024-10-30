@@ -214,8 +214,9 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicStatus(epic.getId());
             updateEpicTime(subtask.getEpicId());
             return subtask;
+        } else {
+            throw new ManagerValidationException("Эпик подзадачи не существует или подзадача пуста");
         }
-        return null;
     }
 
     @Override

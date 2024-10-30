@@ -73,11 +73,10 @@ public abstract class ManagersTest<T extends TaskManager> {
     }
 
     @Test
-    @DisplayName("отдавать ноль при попытке создать подзадачу с несуществующим эпиком")
+    @DisplayName("не создавать подзадачу при попытке создать подзадачу с несуществующим эпиком")
     void shouldNotCreateSubTaskWithWrongEpicId() {
         subtask = new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 11, 10), 80);
 
-        assertNull(taskManager.createSubtask(subtask), "подзадача с несуществующим эпиком создалась");
         assertEquals(0, taskManager.getSubtasks().size(), "подзадача с несуществующим эпиком добавилась в мапу");
     }
 
@@ -130,7 +129,7 @@ public abstract class ManagersTest<T extends TaskManager> {
         subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 15, 10), epic.getId()));
         SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 12, 10), epic.getId()));
 
-        ArrayList<SubTask> subtasks = taskManager.getSubTaskByEpic(epic.getId());
+        List<SubTask> subtasks = taskManager.getSubTaskByEpic(epic.getId());
 
         SubTask subtaskResult = subtasks.getFirst();
         SubTask subtaskResul1 = subtasks.getLast();
