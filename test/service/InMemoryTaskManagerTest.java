@@ -41,7 +41,8 @@ public class InMemoryTaskManagerTest extends ManagersTest<InMemoryTaskManager> {
         task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
         taskManager = new InMemoryTaskManager(new HistoryManager() {
             @Override
-            public void add(Task task) {}
+            public void add(Task task) {
+            }
 
             @Override
             public List<Task> getAll() {
@@ -49,7 +50,8 @@ public class InMemoryTaskManagerTest extends ManagersTest<InMemoryTaskManager> {
             }
 
             @Override
-            public void remove(int id) {}
+            public void remove(int id) {
+            }
         }
         );
 

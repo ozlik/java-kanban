@@ -25,7 +25,7 @@ public interface TaskManager {
     //методы для Epic
     ArrayList<Epic> getEpics();
 
-    ArrayList<SubTask> getSubTaskByEpic(Integer id);
+    List<SubTask> getSubTaskByEpic(Integer id);
 
     Epic getEpicByID(Integer id);
 
@@ -51,4 +51,6 @@ public interface TaskManager {
     void deleteSubtaskById(Integer id);
 
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }

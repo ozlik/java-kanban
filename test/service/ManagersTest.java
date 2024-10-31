@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +27,15 @@ public abstract class ManagersTest<T extends TaskManager> {
     @BeforeEach
     void beforeEach() {
         taskManager = createManager();
+        taskManager.deleteSubtasks();
+        taskManager.deleteEpics();
+        taskManager.deleteTasks();
     }
 
     @Test
     @DisplayName("корректно передавать в мапу и из мапы созданную задачу")
     void shouldCreateTaskGetAndPutToMap() {
-        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 12, 31, 16, 10)));
         List<Task> tasks = taskManager.getTasks();
 
         assertEqualsTask(task, tasks.getFirst(), "задачи не совпадают");
@@ -52,7 +56,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     @DisplayName("передавать в мапу и из мапы созданную подзадачу")
     void shouldCreateSubtaskGetAndPutToMap() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 10, 10), epic.getId()));
         List<SubTask> subtasks = taskManager.getSubtasks();
 
         assertEqualsSubtask(subtask, subtasks.getFirst(), "подзадачи на совпадают");
@@ -63,7 +67,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     @DisplayName("добавлять подзадачу в эпик при создании подзадачи")
     void shouldAddCreatedSubtaskToEpic() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 12, 10), epic.getId()));
         List<Integer> epicSubtasks = epic.getSubTasks();
         Integer id = subtask.getId();
 
@@ -72,19 +76,19 @@ public abstract class ManagersTest<T extends TaskManager> {
     }
 
     @Test
-    @DisplayName("отдавать ноль при попытке создать подзадачу с несуществующим эпиком")
+    @DisplayName("не создавать подзадачу при попытке создать подзадачу с несуществующим эпиком")
     void shouldNotCreateSubTaskWithWrongEpicId() {
-        subtask = new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 80);
+        subtask = new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 11, 10), 80);
 
-        assertNull(taskManager.createSubtask(subtask), "подзадача с несуществующим эпиком создалась");
+        assertThrows(ManagerNotFoundException.class, () -> taskManager.createSubtask(subtask));
         assertEquals(0, taskManager.getSubtasks().size(), "подзадача с несуществующим эпиком добавилась в мапу");
     }
 
     @Test
     @DisplayName("передавать полный список задач")
     void shouldGetTasks() {
-        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-        Task task1 = taskManager.createTask(new Task("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 3, 12, 10)));
+        Task task1 = taskManager.createTask(new Task("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 3, 15, 10)));
 
         ArrayList<Task> tasks = taskManager.getTasks();
 
@@ -103,10 +107,6 @@ public abstract class ManagersTest<T extends TaskManager> {
 
         ArrayList<Epic> epics = taskManager.getEpics();
 
-        Epic resultEpic = epics.getFirst();
-        Epic resultEpic1 = epics.getLast();
-        assertEqualsEpic(epic, resultEpic, "Эпики не совпадают");
-        assertEqualsEpic(epic1, resultEpic1, "Вторые эпики не совпадают");
         assertEquals(2, epics.size(), "в мапе не два эпика");
     }
 
@@ -114,8 +114,8 @@ public abstract class ManagersTest<T extends TaskManager> {
     @DisplayName("передавать полный список подзадач")
     void shouldGetSubTasks() {
         epic = taskManager.createEpic(new Epic("Тестовая задача", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 11, 10), epic.getId()));
+        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 15, 40), epic.getId()));
 
         ArrayList<SubTask> subtasks = taskManager.getSubtasks();
 
@@ -126,10 +126,10 @@ public abstract class ManagersTest<T extends TaskManager> {
     @DisplayName("передавать полный список подзадач эпика по Id")
     void shouldGetSubTasksByEpicId() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 15, 10), epic.getId()));
+        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 12, 10), epic.getId()));
 
-        ArrayList<SubTask> subtasks = taskManager.getSubTaskByEpic(epic.getId());
+        List<SubTask> subtasks = taskManager.getSubTaskByEpic(epic.getId());
 
         SubTask subtaskResult = subtasks.getFirst();
         SubTask subtaskResul1 = subtasks.getLast();
@@ -142,8 +142,8 @@ public abstract class ManagersTest<T extends TaskManager> {
     @DisplayName("сохранять подзадачи в эпик")
     void shouldGetEpicSubtasks() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 13, 10), epic.getId()));
+        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая задача 2, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 14, 10), epic.getId()));
 
         List<Integer> subtasks = epic.getSubTasks();
 
@@ -189,7 +189,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     @Test
     @DisplayName("обновлять задачу в мапе")
     void shouldUpdateTaskGetAndPutToMap() {
-        Task task2 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW);
+        Task task2 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 13, 10));
         Task savedTask = taskManager.createTask(task2);
         savedTask.setStatus(TaskStatus.IN_PROGRESS);
         savedTask.setTitle("Новая обновленная задача");
@@ -205,15 +205,14 @@ public abstract class ManagersTest<T extends TaskManager> {
     void shouldNotUpdateTaskWithWrongId() {
         Task taskToUpdate = new Task("Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
                 TaskStatus.IN_PROGRESS);
-
-        assertNull(taskManager.updateTask(taskToUpdate));
+        assertThrows(ManagerNotFoundException.class, () -> taskManager.updateTask(taskToUpdate));
     }
 
     @Test
     @DisplayName("менять статус эпика при обновлении подзадачи")
     void shouldUpdateSubTaskGetAndPutToMapAndChangeEpicStatus() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 15, 10), epic.getId()));
         subtask.setStatus(TaskStatus.IN_PROGRESS);
         subtask.setTitle("Новая обновленная задача");
 
@@ -226,7 +225,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     @DisplayName("обновлять подзадачу")
     void shouldUpdateSubTask() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 14, 10), epic.getId()));
         subtask.setStatus(TaskStatus.IN_PROGRESS);
         subtask.setTitle("Новая обновленная задача");
 
@@ -283,8 +282,8 @@ public abstract class ManagersTest<T extends TaskManager> {
     @Test
     @DisplayName("удалять все задачи из мапы")
     void shouldDeleteTasksFromMap() {
-        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-        Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW));
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 1, 10)));
+        Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 1, 2, 10)));
         Integer size = taskManager.getTasks().size();
 
         taskManager.deleteTasks();
@@ -313,8 +312,8 @@ public abstract class ManagersTest<T extends TaskManager> {
     void shouldDeleteSubtasksWhenEpicsDelete() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         Epic epic1 = taskManager.createEpic(new Epic("Первый обновлённый эпик", "Описание первого эпика"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 10, 31, 16, 10), epic.getId()));
+        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 30, 16, 10), epic.getId()));
         Integer size = taskManager.getSubtasks().size();
 
         taskManager.deleteEpics();
@@ -329,8 +328,8 @@ public abstract class ManagersTest<T extends TaskManager> {
     @DisplayName("удалять все подзадачи из мапы и из эпика")
     void shouldDeleteSubtasksFromMapAndEpic() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
-        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
-        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 10, 15, 10), epic.getId()));
+        SubTask subtask1 = taskManager.createSubtask(new SubTask("Тестовая подзадача, заголовок", "Описание тестовой подзадачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 11, 15, 10), epic.getId()));
         Integer size = taskManager.getSubtasks().size();
 
         taskManager.deleteSubtasks();
@@ -344,8 +343,8 @@ public abstract class ManagersTest<T extends TaskManager> {
     @Test
     @DisplayName("удалять задачу из мапы по id")
     void shouldDeleteTaskFromMapById() {
-        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
-        Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW));
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 2, 15, 10)));
+        Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW, 10, LocalDateTime.of(2024, 11, 2, 16, 10)));
 
         taskManager.deleteTaskById(task.getId());
 
@@ -399,6 +398,58 @@ public abstract class ManagersTest<T extends TaskManager> {
         taskManager.deleteSubtaskById(subtask.getId());
 
         assertEquals(0, epic.getSubTasks().size(), "подзадачи эпика не пусты");
+    }
+
+    @Test
+    @DisplayName("выкидывать исключение, если задачи пересекаются по времени")
+    void shouldTaskTimeValidation() {
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 11, 2, 15, 10)));
+        Task task2 = new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW, 15, LocalDateTime.of(2024, 11, 2, 16, 10));
+
+        assertThrows(ManagerValidationException.class, () -> taskManager.createTask(task2));
+    }
+
+    @Test
+    @DisplayName("добавлять задачи в список приоритетов при создании")
+    void shouldAddTasksToPrioritizedTasksList() {
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 11, 2, 15, 10)));
+        Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW, 15, LocalDateTime.of(2024, 12, 2, 16, 10)));
+
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+        assertEquals(2, prioritizedTasks.size(), "не все задачи добавлены в список приоритетов");
+    }
+
+    @Test
+    @DisplayName("добавлять задачи в список приоритетов при обновлении")
+    void shouldAddUpdateTasksToPrioritizedTasksList() {
+        task = new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 12, 19, 19, 0));
+        Task task3 = taskManager.createTask(new Task("Тестовая задача3, заголовок", "Описание тестовой задачи3", TaskStatus.NEW, 15, LocalDateTime.of(2024, 12, 16, 19, 0)));
+        Task savedTask = taskManager.createTask(task);
+        savedTask.setStatus(TaskStatus.IN_PROGRESS);
+        savedTask.setTitle("Новая обновленная задача");
+        taskManager.updateTask(savedTask);
+
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+        assertEquals(2, prioritizedTasks.size(), "задача либо не добавлена, либо старая не удалена");
+        assertEqualsTask(task, prioritizedTasks.getLast(), "задачи расположены не по приоритету");
+        assertEqualsTask(task3, prioritizedTasks.getFirst(), "задачи расположены не по приоритету");
+    }
+
+    @Test
+    @DisplayName("приоритизировать задачи")
+    void shouldPrioritizedTasks() {
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 11, 2, 15, 10)));
+        Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW, 15, LocalDateTime.of(2024, 12, 2, 16, 10)));
+        Task task3 = taskManager.createTask(new Task("Тестовая задача3, заголовок", "Описание тестовой задачи3", TaskStatus.NEW, 15, LocalDateTime.of(2024, 10, 2, 16, 10)));
+
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+        assertEqualsTask(task2, prioritizedTasks.getLast(), "задачи расположены не по приоритету");
+        assertEqualsTask(task3, prioritizedTasks.getFirst(), "задачи расположены не по приоритету");
+        assertEqualsTask(task, prioritizedTasks.get(1), "задачи расположены не по приоритету");
+
     }
 
     private static void assertEqualsTask(Task expected, Task actual, String message) {

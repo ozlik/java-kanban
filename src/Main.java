@@ -2,6 +2,7 @@ import model.*;
 import service.*;
 
 import java.io.File;
+import java.time.LocalDateTime;
 
 public class Main {
 
@@ -10,21 +11,27 @@ public class Main {
         File file1 = new File("File.csv");
         FileBackedTaskManager taskManager = new FileBackedTaskManager(file1);
 
-        Task task1 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW);
+        Task task1 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW, 100);
         Epic epic1 = new Epic("Первый эпик", "Описание первого эпика");
-        SubTask subtask1 = new SubTask("Подзадача первого эпика", "Описание подзадачи первого эпика", TaskStatus.NEW, 1);
-        SubTask subtask2 = new SubTask("Подзадача 2 первого эпика", "Описание подзадачи 2 первого эпика", TaskStatus.IN_PROGRESS, 1);
+        SubTask subtask1 = new SubTask("Подзадача первого эпика", "Описание подзадачи первого эпика", TaskStatus.NEW, 100, LocalDateTime.of(2024, 12, 31, 16, 10), 0);
+        SubTask subtask2 = new SubTask("Подзадача 2 первого эпика", "Описание подзадачи 2 первого эпика", TaskStatus.IN_PROGRESS, 15, LocalDateTime.of(2024, 12, 31, 15, 5), 0);
 
-        taskManager.createTask(task1);
         taskManager.createEpic(epic1);
         taskManager.createSubtask(subtask1);
+        taskManager.createTask(task1);
         taskManager.createSubtask(subtask2);
+
+        System.out.println(taskManager.getSubTaskByEpic(0));
+
+        System.out.println(taskManager.getPrioritizedTasks());
 
         FileBackedTaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file1);
         System.out.println("Бэкап: ");
         System.out.println(taskManager1.getTasks());
-        System.out.println(taskManager1.getEpics());
         System.out.println(taskManager1.getSubtasks());
+        System.out.println(taskManager1.getEpics());
+
+        System.out.println(taskManager.getPrioritizedTasks());
 
 //        System.out.println(taskManager.getTaskByID(0));
 //        System.out.println(taskManager.getEpicByID(1));
