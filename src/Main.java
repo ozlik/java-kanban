@@ -13,9 +13,8 @@ public class Main {
 
         Task task1 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW, 100);
         Epic epic1 = new Epic("Первый эпик", "Описание первого эпика");
-        SubTask subtask1 = new SubTask("Подзадача первого эпика", "Описание подзадачи первого эпика", TaskStatus.NEW, 100, LocalDateTime.of(2024, 10, 31, 16, 10), 0);
-        SubTask subtask2 = new SubTask("Подзадача 2 первого эпика", "Описание подзадачи 2 первого эпика", TaskStatus.IN_PROGRESS, 15, LocalDateTime.of(2024, 10, 31, 16, 5), 0);
-
+        SubTask subtask1 = new SubTask("Подзадача первого эпика", "Описание подзадачи первого эпика", TaskStatus.NEW, 100, LocalDateTime.of(2024, 12, 31, 16, 10), 0);
+        SubTask subtask2 = new SubTask("Подзадача 2 первого эпика", "Описание подзадачи 2 первого эпика", TaskStatus.IN_PROGRESS, 15, LocalDateTime.of(2024, 12, 31, 15, 5), 0);
 
         taskManager.createEpic(epic1);
         taskManager.createSubtask(subtask1);
@@ -29,8 +28,9 @@ public class Main {
         FileBackedTaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file1);
         System.out.println("Бэкап: ");
         System.out.println(taskManager1.getTasks());
-        System.out.println(taskManager1.getEpics());
         System.out.println(taskManager1.getSubtasks());
+        System.out.println(taskManager1.getEpics());
+
         System.out.println(taskManager.getPrioritizedTasks());
 
 //        System.out.println(taskManager.getTaskByID(0));

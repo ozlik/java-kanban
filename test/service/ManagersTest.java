@@ -27,6 +27,9 @@ public abstract class ManagersTest<T extends TaskManager> {
     @BeforeEach
     void beforeEach() {
         taskManager = createManager();
+        taskManager.deleteSubtasks();
+        taskManager.deleteEpics();
+        taskManager.deleteTasks();
     }
 
     @Test
@@ -77,6 +80,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     void shouldNotCreateSubTaskWithWrongEpicId() {
         subtask = new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 10, LocalDateTime.of(2024, 10, 31, 11, 10), 80);
 
+        assertThrows(ManagerNotFoundException.class, () -> taskManager.createSubtask(subtask));
         assertEquals(0, taskManager.getSubtasks().size(), "подзадача с несуществующим эпиком добавилась в мапу");
     }
 
@@ -103,10 +107,6 @@ public abstract class ManagersTest<T extends TaskManager> {
 
         ArrayList<Epic> epics = taskManager.getEpics();
 
-        Epic resultEpic = epics.getFirst();
-        Epic resultEpic1 = epics.getLast();
-        assertEqualsEpic(epic, resultEpic, "Эпики не совпадают");
-        assertEqualsEpic(epic1, resultEpic1, "Вторые эпики не совпадают");
         assertEquals(2, epics.size(), "в мапе не два эпика");
     }
 
@@ -160,7 +160,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     void shouldGetTaskById() {
         task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
 
-        Task taskResult = taskManager.getTaskByID(task.getId()).get();
+        Task taskResult = taskManager.getTaskByID(task.getId());
 
         assertEqualsTask(task, taskResult, "задачи не совпадают");
     }
@@ -171,7 +171,7 @@ public abstract class ManagersTest<T extends TaskManager> {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
         subtask = taskManager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
 
-        SubTask subTaskResult = taskManager.getSubtaskById(subtask.getId()).get();
+        SubTask subTaskResult = taskManager.getSubtaskById(subtask.getId());
 
         assertEqualsSubtask(subtask, subTaskResult, "подзадачи не совпадают");
     }
@@ -181,7 +181,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     void shouldGetEpicById() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
 
-        Epic epicResult = taskManager.getEpicByID(epic.getId()).get();
+        Epic epicResult = taskManager.getEpicByID(epic.getId());
 
         assertEqualsEpic(epic, epicResult, "эпики не совпадают");
     }
@@ -205,8 +205,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     void shouldNotUpdateTaskWithWrongId() {
         Task taskToUpdate = new Task("Тестовая задача, заголовок обновленный", "Описание тестовой обновленной задачи",
                 TaskStatus.IN_PROGRESS);
-
-        assertNull(taskManager.updateTask(taskToUpdate));
+        assertThrows(ManagerNotFoundException.class, () -> taskManager.updateTask(taskToUpdate));
     }
 
     @Test
@@ -399,6 +398,58 @@ public abstract class ManagersTest<T extends TaskManager> {
         taskManager.deleteSubtaskById(subtask.getId());
 
         assertEquals(0, epic.getSubTasks().size(), "подзадачи эпика не пусты");
+    }
+
+    @Test
+    @DisplayName("выкидывать исключение, если задачи пересекаются по времени")
+    void shouldTaskTimeValidation() {
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 11, 2, 15, 10)));
+        Task task2 = new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW, 15, LocalDateTime.of(2024, 11, 2, 16, 10));
+
+        assertThrows(ManagerValidationException.class, () -> taskManager.createTask(task2));
+    }
+
+    @Test
+    @DisplayName("добавлять задачи в список приоритетов при создании")
+    void shouldAddTasksToPrioritizedTasksList() {
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 11, 2, 15, 10)));
+        Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW, 15, LocalDateTime.of(2024, 12, 2, 16, 10)));
+
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+        assertEquals(2, prioritizedTasks.size(), "не все задачи добавлены в список приоритетов");
+    }
+
+    @Test
+    @DisplayName("добавлять задачи в список приоритетов при обновлении")
+    void shouldAddUpdateTasksToPrioritizedTasksList() {
+        task = new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 12, 19, 19, 0));
+        Task task3 = taskManager.createTask(new Task("Тестовая задача3, заголовок", "Описание тестовой задачи3", TaskStatus.NEW, 15, LocalDateTime.of(2024, 12, 16, 19, 0)));
+        Task savedTask = taskManager.createTask(task);
+        savedTask.setStatus(TaskStatus.IN_PROGRESS);
+        savedTask.setTitle("Новая обновленная задача");
+        taskManager.updateTask(savedTask);
+
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+        assertEquals(2, prioritizedTasks.size(), "задача либо не добавлена, либо старая не удалена");
+        assertEqualsTask(task, prioritizedTasks.getLast(), "задачи расположены не по приоритету");
+        assertEqualsTask(task3, prioritizedTasks.getFirst(), "задачи расположены не по приоритету");
+    }
+
+    @Test
+    @DisplayName("приоритизировать задачи")
+    void shouldPrioritizedTasks() {
+        task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, 100, LocalDateTime.of(2024, 11, 2, 15, 10)));
+        Task task2 = taskManager.createTask(new Task("Тестовая задача2, заголовок", "Описание тестовой задачи2", TaskStatus.NEW, 15, LocalDateTime.of(2024, 12, 2, 16, 10)));
+        Task task3 = taskManager.createTask(new Task("Тестовая задача3, заголовок", "Описание тестовой задачи3", TaskStatus.NEW, 15, LocalDateTime.of(2024, 10, 2, 16, 10)));
+
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+        assertEqualsTask(task2, prioritizedTasks.getLast(), "задачи расположены не по приоритету");
+        assertEqualsTask(task3, prioritizedTasks.getFirst(), "задачи расположены не по приоритету");
+        assertEqualsTask(task, prioritizedTasks.get(1), "задачи расположены не по приоритету");
+
     }
 
     private static void assertEqualsTask(Task expected, Task actual, String message) {

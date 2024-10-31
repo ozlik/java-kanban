@@ -48,11 +48,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Optional<Task> getTaskByID(Integer id) {
+    public Task getTaskByID(Integer id) {
         if (tasks.get(id) != null) {
             historyManager.add(tasks.get(id));
+            return tasks.get(id);
+        } else {
+            throw new ManagerNotFoundException("Подзадачи с таким id нет " + id);
         }
-        return Optional.ofNullable(tasks.get(id));
     }
 
     @Override
@@ -65,19 +67,21 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.add(task);
             return task;
         }
-        return null;
+        throw new ManagerNotFoundException("Задача, которую вы пытаетесь создать, пуста");
     }
 
     @Override
     public Task updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
-            prioritizedTasks.remove(task);
+            Task oldTask = tasks.get(task.getId());
+            prioritizedTasks.remove(oldTask);
+            resetSchedule(oldTask);
             taskTimeValidation(task);
             prioritizedTasks.add(task);
             tasks.put(task.getId(), task);
             return task;
         }
-        return null;
+        throw new ManagerNotFoundException("Задача, которую вы пытаетесь обновить, не существует или пуста");
     }
 
     protected Task addTask(Integer id, Task task) {
@@ -86,7 +90,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.add(task);
             return task;
         }
-        return null;
+        throw new ManagerNotFoundException("Задача, которую вы пытаетесь создать, пуста");
     }
 
     @Override
@@ -124,11 +128,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Optional<Epic> getEpicByID(Integer id) {
+    public Epic getEpicByID(Integer id) {
         if (epics.get(id) != null) {
             historyManager.add(epics.get(id));
+            return epics.get(id);
+        } else {
+            throw new ManagerNotFoundException("Эпика с таким id нет " + id);
         }
-        return Optional.ofNullable(epics.get(id));
     }
 
     @Override
@@ -139,7 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
             epics.put(id, epic);
             return epic;
         }
-        return null;
+        throw new ManagerNotFoundException("Эпик, который вы пытаетесь создать, пуст ");
     }
 
     @Override
@@ -150,7 +156,7 @@ public class InMemoryTaskManager implements TaskManager {
             oldEpic.setDescription(epic.getDescription());
             return oldEpic;
         }
-        return null;
+        throw new ManagerNotFoundException("Эпик, который вы пытаетесь обновить, не существует или пуст " + epic.getId());
     }
 
     protected Epic addEpic(Integer id, Epic epic) {
@@ -158,7 +164,7 @@ public class InMemoryTaskManager implements TaskManager {
             epics.put(id, epic);
             return epic;
         }
-        return null;
+        throw new ManagerNotFoundException("Эпик, который вы пытаетесь создать, пуст");
     }
 
     @Override
@@ -194,11 +200,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Optional<SubTask> getSubtaskById(Integer id) {
+    public SubTask getSubtaskById(Integer id) {
         if (subtasks.get(id) != null) {
             historyManager.add(subtasks.get(id));
+            return subtasks.get(id);
+        } else {
+            throw new ManagerNotFoundException("Эпика с таким id нет " + id);
         }
-        return Optional.ofNullable(subtasks.get(id));
     }
 
     @Override
@@ -215,22 +223,25 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicTime(subtask.getEpicId());
             return subtask;
         } else {
-            throw new ManagerValidationException("Эпик подзадачи не существует или подзадача пуста");
+            throw new ManagerNotFoundException("Эпик подзадачи не существует или подзадача пуста");
         }
     }
 
     @Override
     public SubTask updateSubTask(SubTask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
-            prioritizedTasks.remove(subtask);
+            SubTask oldSubtask = subtasks.get(subtask.getId());
+            prioritizedTasks.remove(oldSubtask);
+            resetSchedule(oldSubtask);
             taskTimeValidation(subtask);
             prioritizedTasks.add(subtask);
             subtasks.put(subtask.getId(), subtask);
             updateEpicStatus(subtask.getEpicId());
             updateEpicTime(subtask.getEpicId());
             return subtask;
+        } else {
+            throw new ManagerNotFoundException("Подзадача, которую вы пытаетесь обновить, не существует");
         }
-        return null;
     }
 
     protected SubTask addSubtask(Integer id, SubTask subtask) {
@@ -239,7 +250,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.add(subtask);
             return subtask;
         }
-        return null;
+        throw new ManagerNotFoundException("Подзадачу, которую вы пытаетесь создать, пуста");
     }
 
     private void updateEpicStatus(Integer id) {
@@ -268,15 +279,15 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private void updateEpicTime(Integer id) {
-        Epic epic = getEpicByID(id).get();
+    public void updateEpicTime(Integer id) {
+        Epic epic = getEpicByID(id);
         epic.setDuration(calculateEpicDuration(id));
         epic.setStartTime(calculateEpicStartTime(id));
         epic.setEndTime(calculateEpicEndTime(id));
     }
 
     private int calculateEpicDuration(Integer id) {
-        Epic epic = getEpicByID(id).get();
+        Epic epic = getEpicByID(id);
 
         return epic.getSubTasks().stream()
                 .mapToInt(subtaskId -> subtasks.get(subtaskId).getDuration())
@@ -284,7 +295,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private LocalDateTime calculateEpicStartTime(Integer id) {
-        Epic epic = getEpicByID(id).get();
+        Epic epic = getEpicByID(id);
         return epic.getSubTasks().stream()
                 .map(subtasks::get)
                 .map(SubTask::getStartTime)
@@ -293,7 +304,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private LocalDateTime calculateEpicEndTime(Integer id) {
-        Epic epic = getEpicByID(id).get();
+        Epic epic = getEpicByID(id);
         return epic.getSubTasks().stream()
                 .map(subtasks::get)
                 .map(SubTask::getEndTime)
@@ -318,11 +329,23 @@ public class InMemoryTaskManager implements TaskManager {
                 startTimeRoundUp = startTimeRoundUp.plusMinutes(15); // Переходим к следующему 15-минутному интервалу
             }
         }
+        if(startTimeRoundUp.equals(endTimeRoundUp) && timeSlots.get(startTimeRoundUp)) {
+            return true;
+        }
         return false;
     }
 
     private void updateSchedule(LocalDateTime time) {
         timeSlots.put(time, true);
+    }
+
+    private void resetSchedule(Task task) {
+        LocalDateTime startTimeRoundUp = taskScheduler.roundUpTime(task.getStartTime());
+        LocalDateTime endTimeRoundUp = taskScheduler.roundUpTime(task.getEndTime());
+        while (startTimeRoundUp.isBefore(endTimeRoundUp)) {
+            timeSlots.put(startTimeRoundUp, false);
+            startTimeRoundUp = startTimeRoundUp.plusMinutes(15);
+        }
     }
 
     @Override

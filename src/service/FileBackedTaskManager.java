@@ -53,15 +53,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         super.addSubtask(id, (SubTask) task);
                     } else if (task.getType() == TaskType.EPIC) {
                         super.addEpic(id, (Epic) task);
+
                     }
                     taskManager.setIdCounter(maxId);
                 }
             }
             if (!subtasks.isEmpty()) {
-                for (SubTask s : subtasks.values()) {
-                    Epic epic = epics.get(s.getEpicId());
-                    epic.addSubTask(s.getId());
-                }
+                subtasks.values()
+                        .forEach(s -> {
+                            Epic epic = epics.get(s.getEpicId());
+                            epic.addSubTask(s.getId());
+                            updateEpicTime(epic.getId());
+                        });
+
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла ошибка во время чтения файла." + file.getAbsolutePath(), e);
