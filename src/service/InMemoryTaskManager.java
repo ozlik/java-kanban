@@ -329,7 +329,7 @@ public class InMemoryTaskManager implements TaskManager {
                 startTimeRoundUp = startTimeRoundUp.plusMinutes(15); // Переходим к следующему 15-минутному интервалу
             }
         }
-        if(startTimeRoundUp.equals(endTimeRoundUp) && timeSlots.get(startTimeRoundUp)) {
+        if (startTimeRoundUp.equals(endTimeRoundUp) && timeSlots.get(startTimeRoundUp)) {
             return true;
         }
         return false;
