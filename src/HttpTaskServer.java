@@ -1,15 +1,20 @@
+import com.google.gson.Gson;
+import com.sun.net.httpserver.HttpServer;
+import http.TaskHttpHandler;
 import model.*;
 import service.*;
 
-import java.io.File;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
 
-public class Main {
+public class HttpTaskServer {
+    private static final int PORT = 8080;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        TaskManager taskManager = new InMemoryTaskManager(historyManager);
 
-        File file1 = new File("File.csv");
-        FileBackedTaskManager taskManager = new FileBackedTaskManager(file1);
 
         Task task1 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW, 100);
         Epic epic1 = new Epic("Первый эпик", "Описание первого эпика");
@@ -21,17 +26,45 @@ public class Main {
         taskManager.createTask(task1);
         taskManager.createSubtask(subtask2);
 
-        System.out.println(taskManager.getSubTaskByEpic(0));
 
-        System.out.println(taskManager.getPrioritizedTasks());
+        Gson gson = Managers.getGson();
+        HttpServer httpServer = HttpServer.create();
 
-        FileBackedTaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file1);
-        System.out.println("Бэкап: ");
-        System.out.println(taskManager1.getTasks());
-        System.out.println(taskManager1.getSubtasks());
-        System.out.println(taskManager1.getEpics());
+        httpServer.bind(new InetSocketAddress(PORT), 0); // связываем сервер с сетевым портом
+        httpServer.createContext("/tasks", new TaskHttpHandler(taskManager, gson));
+        httpServer.createContext("/epics", new TaskHttpHandler(taskManager, gson));
+        httpServer.createContext("/subtasks", new TaskHttpHandler(taskManager, gson));
+        httpServer.createContext("/history", new TaskHttpHandler(taskManager, gson));
+        httpServer.createContext("/prioritized", new TaskHttpHandler(taskManager, gson));
+        httpServer.start(); // запускаем сервер
 
-        System.out.println(taskManager.getPrioritizedTasks());
+        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
+
+
+//        File file1 = new File("File.csv");
+//        FileBackedTaskManager taskManager = new FileBackedTaskManager(file1);
+//
+//        Task task1 = new Task("Первая задача", "Описание первой задачи", TaskStatus.NEW, 100);
+//        Epic epic1 = new Epic("Первый эпик", "Описание первого эпика");
+//        SubTask subtask1 = new SubTask("Подзадача первого эпика", "Описание подзадачи первого эпика", TaskStatus.NEW, 100, LocalDateTime.of(2024, 12, 31, 16, 10), 0);
+//        SubTask subtask2 = new SubTask("Подзадача 2 первого эпика", "Описание подзадачи 2 первого эпика", TaskStatus.IN_PROGRESS, 15, LocalDateTime.of(2024, 12, 31, 15, 5), 0);
+//
+//        taskManager.createEpic(epic1);
+//        taskManager.createSubtask(subtask1);
+//        taskManager.createTask(task1);
+//        taskManager.createSubtask(subtask2);
+//
+//        System.out.println(taskManager.getSubTaskByEpic(0));
+//
+//        System.out.println(taskManager.getPrioritizedTasks());
+//
+//        FileBackedTaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file1);
+//        System.out.println("Бэкап: ");
+//        System.out.println(taskManager1.getTasks());
+//        System.out.println(taskManager1.getSubtasks());
+//        System.out.println(taskManager1.getEpics());
+//
+//        System.out.println(taskManager.getPrioritizedTasks());
 
 //        System.out.println(taskManager.getTaskByID(0));
 //        System.out.println(taskManager.getEpicByID(1));

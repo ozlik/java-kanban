@@ -35,6 +35,11 @@ public class SubTask extends Task {
         return TaskType.SUBTASK;
     }
 
+
+    public void setType(TaskType type) {
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

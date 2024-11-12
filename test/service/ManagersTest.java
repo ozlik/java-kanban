@@ -160,7 +160,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     void shouldGetTaskById() {
         task = taskManager.createTask(new Task("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW));
 
-        Task taskResult = taskManager.getTaskByID(task.getId());
+        Task taskResult = taskManager.getTaskById(task.getId());
 
         assertEqualsTask(task, taskResult, "задачи не совпадают");
     }
@@ -181,7 +181,7 @@ public abstract class ManagersTest<T extends TaskManager> {
     void shouldGetEpicById() {
         epic = taskManager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
 
-        Epic epicResult = taskManager.getEpicByID(epic.getId());
+        Epic epicResult = taskManager.getEpicById(epic.getId());
 
         assertEqualsEpic(epic, epicResult, "эпики не совпадают");
     }

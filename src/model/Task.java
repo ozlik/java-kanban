@@ -110,7 +110,8 @@ public class Task {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
-                ", type=" + type +
+                ", type=" + getType() +
                 '}';
     }
+
 }

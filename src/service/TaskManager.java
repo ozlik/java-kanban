@@ -12,7 +12,7 @@ public interface TaskManager {
     //методы для Task
     ArrayList<Task> getTasks();
 
-    Task getTaskByID(Integer id);
+    Task getTaskById(Integer id);
 
     Task createTask(Task task);
 
@@ -27,7 +27,7 @@ public interface TaskManager {
 
     List<SubTask> getSubTaskByEpic(Integer id);
 
-    Epic getEpicByID(Integer id);
+    Epic getEpicById(Integer id);
 
     Epic createEpic(Epic epic);
 
