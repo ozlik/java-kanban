@@ -14,24 +14,26 @@ public class HttpTaskServer {
     HttpServer httpServer;
 
     public HttpTaskServer() throws IOException {
-    historyManager = new InMemoryHistoryManager();
-    taskManager = new InMemoryTaskManager(historyManager);
+        historyManager = new InMemoryHistoryManager();
+        taskManager = new InMemoryTaskManager(historyManager);
 
-    gson = Managers.getGson();
-    httpServer = HttpServer.create();
+        gson = Managers.getGson();
+        httpServer = HttpServer.create();
 
         httpServer.bind(new InetSocketAddress(PORT), 0); // связываем сервер с сетевым портом
         httpServer.createContext("/tasks", new TaskHttpHandler(taskManager, gson));
         httpServer.createContext("/epics", new TaskHttpHandler(taskManager, gson));
         httpServer.createContext("/subtasks", new TaskHttpHandler(taskManager, gson));
         httpServer.createContext("/history", new TaskHttpHandler(taskManager, gson));
-        httpServer.createContext("/prioritized", new TaskHttpHandler(taskManager, gson)); }
+        httpServer.createContext("/prioritized", new TaskHttpHandler(taskManager, gson));
+    }
 
     public void start() {
-               httpServer.start();
+        httpServer.start();
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
 
     }
+
     public void stop() {
         httpServer.stop(0);
         System.out.println("HTTP-сервер остановлен на " + PORT + " порту!");
