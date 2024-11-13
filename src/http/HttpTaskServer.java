@@ -1,6 +1,7 @@
+package http;
+
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
-import http.TaskHttpHandler;
 import service.*;
 
 import java.io.IOException;
@@ -8,24 +9,21 @@ import java.net.InetSocketAddress;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
-    HistoryManager historyManager;
-    TaskManager taskManager;
+
     Gson gson;
     HttpServer httpServer;
 
-    public HttpTaskServer() throws IOException {
-        historyManager = new InMemoryHistoryManager();
-        taskManager = new InMemoryTaskManager(historyManager);
+    public HttpTaskServer(TaskManager taskManager) throws IOException {
 
         gson = Managers.getGson();
         httpServer = HttpServer.create();
 
         httpServer.bind(new InetSocketAddress(PORT), 0); // связываем сервер с сетевым портом
         httpServer.createContext("/tasks", new TaskHttpHandler(taskManager, gson));
-        httpServer.createContext("/epics", new TaskHttpHandler(taskManager, gson));
-        httpServer.createContext("/subtasks", new TaskHttpHandler(taskManager, gson));
-        httpServer.createContext("/history", new TaskHttpHandler(taskManager, gson));
-        httpServer.createContext("/prioritized", new TaskHttpHandler(taskManager, gson));
+        httpServer.createContext("/epics", new EpicHttpHandler(taskManager, gson));
+        httpServer.createContext("/subtasks", new SubtaskHttpHandler(taskManager, gson));
+        httpServer.createContext("/history", new HistoryHttpHandler(taskManager, gson));
+        httpServer.createContext("/prioritized", new PrioritizedHttpHandler(taskManager, gson));
     }
 
     public void start() {
@@ -39,7 +37,9 @@ public class HttpTaskServer {
     }
 
     public static void main(String[] args) throws IOException {
-        HttpTaskServer httpTaskServer = new HttpTaskServer();
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        TaskManager taskManager = new InMemoryTaskManager(historyManager);
+        HttpTaskServer httpTaskServer = new HttpTaskServer(taskManager);
         httpTaskServer.start();
     }
 }

@@ -143,7 +143,7 @@ public class InMemoryTaskManager implements TaskManager {
             Integer id = getIdCounter();
             epic.setId(id);
             epic.setType(epic.getType());
-epic.setEpicSubtasksId(new ArrayList<>());
+            epic.setEpicSubtasksId(new ArrayList<>());
             epics.put(id, epic);
             return epic;
         }
@@ -384,4 +384,10 @@ epic.setEpicSubtasksId(new ArrayList<>());
         return historyManager.getAll();
     }
 
+    @Override
+    public void deleteAll() {
+        deleteTasks();
+        deleteEpics();
+        idCounter = 0;
+    }
 }

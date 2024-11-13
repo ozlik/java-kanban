@@ -1,28 +1,10 @@
 package http;
 
 public enum Endpoint {
-    GET_TASKS,
-    GET_EPICS,
-    GET_SUBTASKS,
-    GET_HISTORY,
-    GET_PRIORITIZED,
-
-    GET_TASK,
-    GET_EPIC,
-    GET_SUBTASK,
-
-    POST_TASK,
-    POST_EPIC,
-    POST_SUBTASK,
-
-    DELETE_TASKS,
-    DELETE_EPICS,
-    DELETE_SUBTASKS,
-
-    DELETE_TASK,
-    DELETE_EPIC,
-    DELETE_SUBTASK,
-
+    GET_ALL,
+    GET,
+    POST,
+    DELETE_ALL,
+    DELETE,
     UNKNOWN
-
 }
