@@ -447,4 +447,27 @@ class HttpTaskServerTest {
         // проверяем задачи
         assertEquals(expectedTasks, tasks, "задачи не совпадают");
     }
+
+    @Test
+    @DisplayName("отдавать подзадачи эпика")
+    public void shouldGetEpicSubtasks() throws IOException, InterruptedException {
+        Epic epic = manager.createEpic(new Epic("Тестовая задача, заголовок", "Описание тестовой задачи"));
+        SubTask subtask = manager.createSubtask(new SubTask("Тестовая задача, заголовок", "Описание тестовой задачи", TaskStatus.NEW, epic.getId()));
+
+        // создаём HTTP-клиент и запрос
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/epics/?id=0/subtasks");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(url)
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        String expectedTasks = gson.toJson(manager.getSubTaskByEpic(epic.getId()));
+        String tasks = response.body();
+        // проверяем код ответа
+        assertEquals(200, response.statusCode());
+        // проверяем задачи
+        assertEquals(expectedTasks, tasks, "задачи не совпадают");
+    }
 }

@@ -19,14 +19,20 @@ public class EpicHttpHandler extends BaseHttpHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         Endpoint endpoint = getEndpoint(exchange);
+        String query = exchange.getRequestURI().getQuery();
         switch (endpoint) {
             case GET_ALL: {
                 handleGetEpics(exchange);
                 break;
             }
             case GET: {
-                handleGetEpic(exchange);
-                break;
+                if (query.endsWith("subtasks")) {
+                    handleGetEpicSubtask(exchange);
+                    break;
+                } else {
+                    handleGetEpic(exchange);
+                    break;
+                }
             }
             case POST: {
                 handlePostEpic(exchange);
@@ -72,6 +78,14 @@ public class EpicHttpHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handleDeleteEpic(HttpExchange exchange) throws IOException {
         handleDeleteObject(exchange, TaskType.EPIC);
+    }
+
+    private void handleGetEpicSubtask(HttpExchange exchange) throws IOException {
+        String[] query = exchange.getRequestURI().getQuery().split("/");
+        String queryFirst = query[0];
+        int id = Integer.parseInt(queryFirst.substring(queryFirst.indexOf("=") + 1));
+        String response = gson.toJson(taskManager.getSubTaskByEpic(id));
+        sendText(exchange, response);
     }
 }
 

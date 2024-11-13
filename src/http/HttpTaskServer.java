@@ -2,10 +2,15 @@ package http;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
+import model.Epic;
+import model.SubTask;
+import model.Task;
+import model.TaskStatus;
 import service.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
@@ -22,6 +27,7 @@ public class HttpTaskServer {
         httpServer.createContext("/tasks", new TaskHttpHandler(taskManager, gson));
         httpServer.createContext("/epics", new EpicHttpHandler(taskManager, gson));
         httpServer.createContext("/subtasks", new SubtaskHttpHandler(taskManager, gson));
+        httpServer.createContext("/epics/{id}/subtasks", new EpicHttpHandler(taskManager, gson));
         httpServer.createContext("/history", new HistoryHttpHandler(taskManager, gson));
         httpServer.createContext("/prioritized", new PrioritizedHttpHandler(taskManager, gson));
     }
