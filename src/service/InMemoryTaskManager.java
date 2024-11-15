@@ -48,7 +48,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTaskByID(Integer id) {
+    public Task getTaskById(Integer id) {
         if (tasks.get(id) != null) {
             historyManager.add(tasks.get(id));
             return tasks.get(id);
@@ -128,7 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic getEpicByID(Integer id) {
+    public Epic getEpicById(Integer id) {
         if (epics.get(id) != null) {
             historyManager.add(epics.get(id));
             return epics.get(id);
@@ -142,6 +142,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             Integer id = getIdCounter();
             epic.setId(id);
+            epic.setType(epic.getType());
+            epic.setEpicSubtasksId(new ArrayList<>());
             epics.put(id, epic);
             return epic;
         }
@@ -161,6 +163,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected Epic addEpic(Integer id, Epic epic) {
         if (epic != null) {
+            epic.setType(epic.getType());
+            epic.setEpicSubtasksId(new ArrayList<>());
             epics.put(id, epic);
             return epic;
         }
@@ -214,6 +218,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask != null && epics.containsKey(subtask.getEpicId())) {
             Integer id = getIdCounter();
             subtask.setId(id);
+            subtask.setType(subtask.getType());
             Epic epic = epics.get(subtask.getEpicId());
             epic.addSubTask(id);
             taskTimeValidation(subtask);
@@ -246,6 +251,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected SubTask addSubtask(Integer id, SubTask subtask) {
         if (subtask != null) {
+            subtask.setType(subtask.getType());
             subtasks.put(id, subtask);
             prioritizedTasks.add(subtask);
             return subtask;
@@ -280,14 +286,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public void updateEpicTime(Integer id) {
-        Epic epic = getEpicByID(id);
+        Epic epic = getEpicById(id);
         epic.setDuration(calculateEpicDuration(id));
         epic.setStartTime(calculateEpicStartTime(id));
         epic.setEndTime(calculateEpicEndTime(id));
     }
 
     private int calculateEpicDuration(Integer id) {
-        Epic epic = getEpicByID(id);
+        Epic epic = getEpicById(id);
 
         return epic.getSubTasks().stream()
                 .mapToInt(subtaskId -> subtasks.get(subtaskId).getDuration())
@@ -295,7 +301,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private LocalDateTime calculateEpicStartTime(Integer id) {
-        Epic epic = getEpicByID(id);
+        Epic epic = getEpicById(id);
         return epic.getSubTasks().stream()
                 .map(subtasks::get)
                 .map(SubTask::getStartTime)
@@ -304,7 +310,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private LocalDateTime calculateEpicEndTime(Integer id) {
-        Epic epic = getEpicByID(id);
+        Epic epic = getEpicById(id);
         return epic.getSubTasks().stream()
                 .map(subtasks::get)
                 .map(SubTask::getEndTime)
@@ -378,4 +384,10 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getAll();
     }
 
+    @Override
+    public void deleteAll() {
+        deleteTasks();
+        deleteEpics();
+        idCounter = 0;
+    }
 }

@@ -1,13 +1,12 @@
 package model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
 
-    private List<Integer> epicSubtasksId = new ArrayList<>();
+    private List<Integer> epicSubtasksId;
     private LocalDateTime endTime;
 
     public Epic(String title, String description) {
@@ -19,11 +18,16 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
-    public void addSubTask(Integer id) {
-        this.epicSubtasksId.add(id);
+
+    public void setType(TaskType type) {
+        this.type = type;
     }
 
-    public void setSubTasks(List<Integer> subtasksId) {
+    public void addSubTask(Integer id) {
+        epicSubtasksId.add(id);
+    }
+
+    public void setEpicSubtasksId(List<Integer> subtasksId) {
         this.epicSubtasksId = subtasksId;
     }
 
