@@ -24,7 +24,11 @@ public class PrioritizedHttpHandler extends BaseHttpHandler implements HttpHandl
     }
 
     private void handleGetPrioritized(HttpExchange exchange) throws IOException {
-        String response = gson.toJson(taskManager.getPrioritizedTasks());
-        sendText(exchange, response);
+        try {
+            String response = gson.toJson(taskManager.getPrioritizedTasks());
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 }

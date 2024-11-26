@@ -80,8 +80,9 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.add(task);
             tasks.put(task.getId(), task);
             return task;
+        } else {
+            throw new ManagerValidationException("Задача, которую вы пытаетесь обновить " + task.getId() + ", не существует.");
         }
-        throw new ManagerNotFoundException("Задача, которую вы пытаетесь обновить, не существует или пуста");
     }
 
     protected Task addTask(Integer id, Task task) {
@@ -320,7 +321,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     private void taskTimeValidation(Task task) {
         if (isTaskOverlap(task)) {
-            throw new ManagerValidationException("Время задачи пересекается с существующей");
+            throw new ManagerInterruptedException("Время задачи пересекается с существующей");
         }
     }
 

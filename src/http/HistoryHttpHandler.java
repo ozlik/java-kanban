@@ -24,7 +24,11 @@ public class HistoryHttpHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetHistory(HttpExchange exchange) throws IOException {
-        String response = gson.toJson(taskManager.getHistory());
-        sendText(exchange, response);
+        try {
+            String response = gson.toJson(taskManager.getHistory());
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 }

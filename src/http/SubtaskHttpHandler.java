@@ -46,32 +46,51 @@ public class SubtaskHttpHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetSubtasks(HttpExchange exchange) throws IOException {
-        String response = gson.toJson(taskManager.getSubtasks());
-        sendText(exchange, response);
+        try {
+            String response = gson.toJson(taskManager.getSubtasks());
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handleGetSubtask(HttpExchange exchange) throws IOException {
-        handleGetObject(exchange, taskManager::getSubtaskById);
+        try {
+            handleGetObject(exchange, taskManager::getSubtaskById);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handlePostSubtask(HttpExchange exchange) throws IOException {
         Optional<Integer> idOpt = getId(exchange);
-
-        if (idOpt.isEmpty()) {
-            handlePostObject(exchange, SubTask.class, taskManager::createSubtask);
-        } else {
-            handlePostObjectUpdate(exchange, SubTask.class, taskManager::updateSubTask);
+        try {
+            if (idOpt.isEmpty()) {
+                handlePostObject(exchange, SubTask.class, taskManager::createSubtask);
+            } else {
+                handlePostObjectUpdate(exchange, SubTask.class, taskManager::updateSubTask);
+            }
+        } catch (Exception exception) {
+            handleException(exchange, exception);
         }
     }
 
     private void handleDeleteSubtasks(HttpExchange exchange) throws IOException {
-        taskManager.deleteSubtasks();
-        String response = "Все подзадачи удалены";
-        sendText(exchange, response);
+        try {
+            taskManager.deleteSubtasks();
+            String response = "Все подзадачи удалены";
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handleDeleteSubtask(HttpExchange exchange) throws IOException {
-        handleDeleteObject(exchange, TaskType.SUBTASK);
+        try {
+            handleDeleteObject(exchange, TaskType.SUBTASK);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
 

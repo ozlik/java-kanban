@@ -52,40 +52,63 @@ public class EpicHttpHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetEpics(HttpExchange exchange) throws IOException {
-        String response = gson.toJson(taskManager.getEpics());
-        sendText(exchange, response);
+        try {
+            String response = gson.toJson(taskManager.getEpics());
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handleGetEpic(HttpExchange exchange) throws IOException {
-        handleGetObject(exchange, taskManager::getEpicById);
+        try {
+            handleGetObject(exchange, taskManager::getEpicById);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handlePostEpic(HttpExchange exchange) throws IOException {
         Optional<Integer> idOpt = getId(exchange);
-
-        if (idOpt.isEmpty()) {
-            handlePostObject(exchange, Epic.class, taskManager::createEpic);
-        } else {
-            handlePostObjectUpdate(exchange, Epic.class, taskManager::updateEpic);
+        try {
+            if (idOpt.isEmpty()) {
+                handlePostObject(exchange, Epic.class, taskManager::createEpic);
+            } else {
+                handlePostObjectUpdate(exchange, Epic.class, taskManager::updateEpic);
+            }
+        } catch (Exception exception) {
+            handleException(exchange, exception);
         }
     }
 
     private void handleDeleteEpics(HttpExchange exchange) throws IOException {
-        taskManager.deleteEpics();
-        String response = "Все эпики подзадачи удалены";
-        sendText(exchange, response);
+        try {
+            taskManager.deleteEpics();
+            String response = "Все эпики подзадачи удалены";
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handleDeleteEpic(HttpExchange exchange) throws IOException {
-        handleDeleteObject(exchange, TaskType.EPIC);
+        try {
+            handleDeleteObject(exchange, TaskType.EPIC);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handleGetEpicSubtask(HttpExchange exchange) throws IOException {
-        String[] query = exchange.getRequestURI().getQuery().split("/");
-        String queryFirst = query[0];
-        int id = Integer.parseInt(queryFirst.substring(queryFirst.indexOf("=") + 1));
-        String response = gson.toJson(taskManager.getSubTaskByEpic(id));
-        sendText(exchange, response);
+        try {
+            String[] query = exchange.getRequestURI().getQuery().split("/");
+            String queryFirst = query[0];
+            int id = Integer.parseInt(queryFirst.substring(queryFirst.indexOf("=") + 1));
+            String response = gson.toJson(taskManager.getSubTaskByEpic(id));
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 }
 

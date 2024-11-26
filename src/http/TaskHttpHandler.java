@@ -46,33 +46,51 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetTasks(HttpExchange exchange) throws IOException {
-        String response = gson.toJson(taskManager.getTasks());
-        sendText(exchange, response);
+        try {
+            String response = gson.toJson(taskManager.getTasks());
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handleGetTask(HttpExchange exchange) throws IOException {
-        handleGetObject(exchange, taskManager::getTaskById);
+        try {
+            handleGetObject(exchange, taskManager::getTaskById);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handlePostTask(HttpExchange exchange) throws IOException {
         Optional<Integer> idOpt = getId(exchange);
-
-        if (idOpt.isEmpty()) {
-            handlePostObject(exchange, Task.class, taskManager::createTask);
-        } else {
-            handlePostObjectUpdate(exchange, Task.class, taskManager::updateTask);
+        try {
+            if (idOpt.isEmpty()) {
+                handlePostObject(exchange, Task.class, taskManager::createTask);
+            } else {
+                handlePostObjectUpdate(exchange, Task.class, taskManager::updateTask);
+            }
+        } catch (Exception exception) {
+            handleException(exchange, exception);
         }
     }
 
     private void handleDeleteTasks(HttpExchange exchange) throws IOException {
-        taskManager.deleteTasks();
-        String response = "Все задачи удалены";
-        sendText(exchange, response);
+        try {
+            taskManager.deleteTasks();
+            String response = "Все задачи удалены";
+            sendText(exchange, response);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
 
     private void handleDeleteTask(HttpExchange exchange) throws IOException {
-        handleDeleteObject(exchange, TaskType.TASK);
+        try {
+            handleDeleteObject(exchange, TaskType.TASK);
+        } catch (Exception exception) {
+            handleException(exchange, exception);
+        }
     }
-
 }
 

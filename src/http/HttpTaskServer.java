@@ -16,7 +16,12 @@ public class HttpTaskServer {
     public HttpTaskServer(TaskManager taskManager) throws IOException {
 
         gson = Managers.getGson();
-        httpServer = HttpServer.create();
+
+        try {
+            httpServer = HttpServer.create();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         httpServer.bind(new InetSocketAddress(PORT), 0); // связываем сервер с сетевым портом
         httpServer.createContext("/tasks", new TaskHttpHandler(taskManager, gson));
